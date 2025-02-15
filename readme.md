@@ -10,6 +10,11 @@ This is a weather app built with `Vue.js/`, Node.js, Python Using MetaCall Loade
 - **Weather Analysis**: Analyze weather data using a Python loader in MetaCall.
 - **Weather Prediction**: Use machine learning models using MetaCall to predict weather trends (e.g., temperature, precipitation).
 
+
+
+
+
+![Weather Dashboard](/showcase/show_case1.png)
 ## Installation
 
 Follow these steps to set up the project locally:
