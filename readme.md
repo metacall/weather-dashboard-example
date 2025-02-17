@@ -46,6 +46,7 @@ Before you begin, make sure you have the following installed on your machine:
    npm install
    ```
    This Will Install All Dependencies Required To Run The Project
+   
 **Frontend Setup:**
 **Install The Requirements**:
 ```bash
