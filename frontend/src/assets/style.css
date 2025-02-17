@@ -149,7 +149,7 @@
     font-weight: 400;
     src: url('@/assets/font/material-symbol-rounded.woff2') format('woff2');
   }
-  .ai-button {
+  #ai-button{
     display: flex;
     position: relative;
     background: linear-gradient(90deg, #6a11cb, #2575fc);
@@ -183,12 +183,12 @@
     transition: opacity 0.3s ease-in-out;
   }
   
-  .ai-button:hover::before {
+  #ai-button:hover::before {
     opacity: 1;
   }
   
   /* Click effect */
-  .ai-button:active {
+  #ai-button:active {
     transform: scale(0.95);
   }
   
@@ -311,6 +311,9 @@
     border-radius: var(--radius-pill);
     
   }
+  #ai-button:disabled {
+    display: none;
+  } 
   
   .btn-primary .span {
     font-weight: var(--weight-semiBold);

@@ -4,7 +4,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "skeleton-loader-vue": "^1.0.10"
+    "winston": "^3.17.0"
   },
   "scripts": {
     "start": "nodemon --exec metacall main.js"

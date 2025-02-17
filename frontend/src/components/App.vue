@@ -1,5 +1,6 @@
 <template>
   <div class="weather-dashboard">
+    
 
     <header class="header">
       <div class="container">
@@ -60,13 +61,26 @@
             
             
           </button>
+          <button  id="ai-button"  class="btn-primary has-state" 
+        @click.prevent="fetchWeatherAnalysis"  
+        data-current-location-btn 
+        :disabled="isnotReady">
+        <span class="m-icon">bolt</span>
+        
+  <span class="span">Weather Assistant</span>
+  <span class="glow"></span>
+  <span class="sparkle sparkle1"></span>
+      <span class="sparkle sparkle2"></span>
+      <span class="sparkle sparkle3"></span>
+</button>
           <button class="btn-primary has-state" 
         @click.prevent="fetchForCurrentLocation" 
-        data-current-location-btn 
+        
         :disabled="isdisabled">
   <span class="m-icon">my_location</span>
   <span class="span">Current Location</span>
 </button>
+
 
         </div>
       </div>
@@ -320,7 +334,7 @@ const {
 } = useWeatherApp();
 
 
-
+const isnotReady = ref(true);
 const city = ref("");
 const weather = ref(null);
 const error = ref("");
@@ -492,6 +506,7 @@ async function fetchForCurrentLocation() {
       fetchWeatherAnalysis(cleanedCity),
       
     ]);
+    isnotReady.value = false; // enable the weather assistant button after fetching all the data 
     city.value = null;
 
       } catch (err) {
@@ -628,6 +643,7 @@ const fetchWeather = async (selectedCity) => {
         error.value = "";
         isSearchActive.value = false;
         isdisabled.value = false;
+        isnotReady.value = false;
         
         city.value = null;
     } catch (err) {
@@ -712,7 +728,7 @@ query.value = '';
 }
 onMounted(async () => {
   
-  
+  document.title = "Climatic";
 });
 
 </script>
