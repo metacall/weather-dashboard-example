@@ -14,8 +14,14 @@ This is a weather app built with `Vue.js/`, Node.js, Python Using MetaCall Loade
 
 
 
+
+
+
+
 ![Weather Dashboard](/showcase/show_case1.png)
-<video src="./showcase/show_vid.mp4" controls width="600"></video>
+
+
+https://github.com/user-attachments/assets/0935acca-4d2e-472e-8fe7-d8cdfc33fde0
 
 ## Installation
 
