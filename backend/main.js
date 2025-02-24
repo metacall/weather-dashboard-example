@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 const { metacall_load_from_file , metacall_inspect } = require("metacall");
 const result = metacall_load_from_file("py", ["weather_analytics.py"]);
-if (result === null) {
+if (result !== 0) {
     console.error("❌ Failed to load Python script.");
     process.exit(1);
 }
