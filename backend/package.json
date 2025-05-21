@@ -1,9 +1,12 @@
 {
   "dependencies": {
+    "@google/genai": "^0.10.0",
+    "@google/generative-ai": "^0.24.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "swagger-ui": "^5.21.0",
     "winston": "^3.17.0"
   },
   "scripts": {

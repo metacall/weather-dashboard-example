@@ -1,3 +1,4 @@
+import statistics
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
@@ -6,6 +7,7 @@ from sklearn.linear_model import LinearRegression
 def get_weather_summary(weather_data, predicted_temp_next_day):
     """Generate a summary of today's weather and tomorrow's predicted temperature."""
     temps = [item["main"]["temp"] for item in weather_data["list"]]
+    avg_temp = round(statistics.mean(temps), 2)   
 
     if len(temps) < 16:
         return {"error": "Not enough data to predict", "language": "Python"}
@@ -80,8 +82,6 @@ def get_weather_stats(weather_data):
         "min_temp": round(np.min(temps), 2),
         "predicted_temp_next_day": round(predicted_temp, 2),
         "trend": trend,
-        "summary": weather_summary["summary"],
-        
-        
+        "summary": weather_summary["summary"],   
         "condition": condition
     }

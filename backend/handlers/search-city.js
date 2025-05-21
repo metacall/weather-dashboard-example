@@ -1,6 +1,7 @@
 // weatherHandler.js
 const axios = require("axios");
 const { WEATHER_API_KEY } = require("../main");
+// Use the environment variable directly
 
 
 
@@ -28,6 +29,7 @@ const searchHandler = async (req, res) => {
       if (!response.data || response.data.length === 0) {
         return res.status(404).json({ error: "No cities found" });
       }
+      console.log(WEATHER_API_KEY)
   
       const cities = response.data.map(city => ({
         name: city.name,
@@ -41,7 +43,7 @@ const searchHandler = async (req, res) => {
       res.json(cities); // Send the array of cities to the frontend
     }  catch (error) {
         console.error("OpenWeatherMap API Error:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Failed to fetch cities from OpenWeatherMap" });
+        res.status(500).json({ error: "Failed to fetch cities from OpenWeatherMap",error });
       }
 };
 

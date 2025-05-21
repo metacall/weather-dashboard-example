@@ -11,6 +11,7 @@ const weatherAnalyzeHandler = async (req, res) => {
         // Fetch Forecast Data from OpenWeatherMap
         const response = await axios.get(`${FORECAST_API_URL}?q=${city}&appid=${WEATHER_API_KEY}&units=metric`);
         const weatherData = response.data;
+        
 
         // Call Python Function via MetaCall
         const analytics = await metacall("get_weather_stats", weatherData);
@@ -22,6 +23,7 @@ const weatherAnalyzeHandler = async (req, res) => {
             description: item.weather[0].description,
             icon: `https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`
         }));
+
 
         
 
@@ -41,6 +43,7 @@ const weatherAnalyzeHandler = async (req, res) => {
             language: analytics.language
         });
     } catch (error) {
+        console.error("Error fetching weather data:", error);
         res.status(500).json({ error: "Failed to fetch weather data" });
     }
 };

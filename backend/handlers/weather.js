@@ -11,6 +11,7 @@ const weatherHandler = async (req, res) => {
         const { city } = req.body;
         const response = await axios.get(`${WEATHER_API_URL}?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric`);
         const weatherData = response.data;
+        console.log(WEATHER_API_KEY)
 
         
 

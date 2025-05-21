@@ -17,8 +17,11 @@ const forecastHandler = async (req, res) => {
             description: item.weather[0].description,
             icon: item.weather[0].icon,
             speed: item.wind.speed,
-            direction: item.wind.deg
+            direction: item.wind.deg,
+            pop: item.pop
         }));
+        
+        console.table(forecast);
 
         
 

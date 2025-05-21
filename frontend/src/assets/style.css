@@ -8,7 +8,7 @@
 \*-----------------------------------*/
 :root{
     /* Colors */
-  --primary: #B5A1E5; 
+ 
   --on-primary: #100E17; 
   --background: #131214;
   --on-background: #EAE6F2;
@@ -33,7 +33,7 @@
   --black-alpha-10: hsla(0, 0%, 0%, 0.1);
   /* Gradients */
   --gradient-1: linear-gradient(180deg, hsla(270, 5%, 7%, 0) 0%, hsla(270, 5%, 7%, 0.8) 65%, hsl(270, 5%, 7%) 100%);
-  --gradient-2: linear-gradient(180deg, hsla(260, 5%, 12%, 0) 0%, hsla(260, 5%, 12%, 0.8) 65%, hsl(260, 5%, 12%) 100%);
+ 
   /*Font Family */
   --ff-nunito-sans: 'Nunito Sans', sans-serif;
   /* Font Size */
@@ -52,8 +52,7 @@
    /**
     * Box Shadows
     */
-  --shadow-1: 0px 1px 3px hsla(0, 0%, 0%, 0.5);
-  --shadow-2: 0px 3px 6px hsla(0, 0%, 0%, 0.4);
+  
   /**
    * Border Radius
    */
@@ -389,6 +388,7 @@
   }
   .header .container {
     justify-content: space-between;
+    gap: 12px;
   }
   .header-actions {
     gap: 16px;
