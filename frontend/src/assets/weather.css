@@ -1,3 +1,4 @@
+
 :root {
   /* Updated Color Palette */
   --primary-bg: #0A0A0A;
@@ -35,10 +36,9 @@
 }
 
 .weather-dashboard {
+ 
+  width: 100%;
   min-height: 100vh;
-  
-  min-width: 100vw;
-  width: 100vw;
   background: var(--primary-bg);
   color: var(--primary-text);
   display: grid;
@@ -66,6 +66,8 @@
   grid-template-rows: auto;
   min-height: auto;
   padding: var(--container-padding);
+  overflow-x: hidden;
+
   
 }
 
@@ -76,6 +78,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
   padding: 0;
 }
 
@@ -85,6 +88,7 @@
     display: block;
     min-height: auto;
     padding: 1rem 0;
+    justify-content: flex-start;
   }
   .landing-content {
     padding: 2rem 1rem;
@@ -199,84 +203,133 @@
 
 @media (max-width: 1200px) {
   .landing-content {
-    gap: 5rem;
-    padding: 6rem 2rem 3rem;
+    gap: 3rem;
+    padding: 4rem 2rem 3rem;
+
+    max-width: 100%;
   }
 
   .main-title {
-    font-size: 5.2rem;
+    font-size: 4.2rem;
   }
 
   .hero-subtitle {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
   }
 
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2.5rem;
+    gap: 2rem;
+    max-width: 100%;
   }
 
   .feature-card {
-    padding: 3.5rem 2.5rem;
-    min-height: 400px;
+    padding: 2.5rem 2rem;
+    min-height: 320px;
   }
 
   .feature-card h3 {
-    font-size: 2.6rem;
+    font-size: 2rem;
   }
 
   .feature-card p {
-    font-size: 1.7rem;
+    font-size: 1.4rem;
   }
 }
 
 @media (max-width: 768px) {
+  .landing-container {
+    padding: 0;
+    overflow-x: hidden;
+  }
   .landing-content {
-    gap: 3rem;
-    padding: 3rem 1.5rem;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .main-title {
-    font-size: 4rem;
-    letter-spacing: -1.5px;
+    font-size: 3.2rem;
+    letter-spacing: -1px;
+    text-align: center;
   }
 
   .hero-subtitle {
-    font-size: 2rem;
-  }
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+      }
 
-  .feature-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 0 1rem;
-  }
-
-  .feature-card {
-    padding: 3rem 2rem;
-    min-height: 380px;
-  }
+      .feature-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        padding: 0;
+        overflow-x: hidden;
+      }
+    
+      .feature-card {
+        width: 100%;
+        max-width: 350px;
+        padding: 2rem 1.5rem;
+        min-height: auto;
+        margin: 0;
+      }
+ 
 
   .feature-icon {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 2.5rem;
-  }
-
-  .feature-icon .m-icon {
-    font-size: 3.5rem;
-  }
-
-  .feature-card h3 {
-    font-size: 2.4rem;
+    width: 70px;
+    height: 70px;
     margin-bottom: 1.5rem;
   }
 
-  .feature-card p {
+  .feature-icon .m-icon {
+    font-size: 2.4rem;
+  }
+
+  .feature-card h3 {
     font-size: 1.6rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+  }
+
+  .feature-card p {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .benefits-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .benefit {
+    min-width: auto;
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
+
+  .benefit .m-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.4rem;
+  }
+
+  .benefit span {
+    font-size: 1.2rem;
   }
 
   .footer-text {
     font-size: 1.2rem;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .footer-logo {
@@ -297,12 +350,12 @@
   text-align: center;
   margin: 0;
   padding: 0;
-  /* Remove background, backdrop-filter, border and box-shadow */
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: none;
   box-shadow: none;
+  overflow-x: hidden;
 }
 
 /* No hover effects on container */
@@ -315,18 +368,20 @@
 
 /* Update main title style to be bolder and more impactful */
 .main-title {
-  font-size: 5rem;
+  font-size: 4.2rem;
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   margin: 0 0 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  /* Remove the float animation */
   animation: none;
+  text-align: center;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .text-normal {
@@ -384,6 +439,19 @@
   border-radius: 0;
 }
 
+@keyframes modern-gradient {
+  0% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}
+
+
 /* Remove the before element */
 .text-gradient::before {
   display: none;
@@ -391,30 +459,13 @@
 
 /* Update hero subtitle to be cleaner */
 .hero-subtitle {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0 auto;
+  color: var(--text-secondary);
+  margin: 0 auto 2rem;
   max-width: 700px;
   font-weight: 400;
-}
-
-/* Responsive adjustments for the main title */
-@media (max-width: 1200px) {
-  .main-title {
-    font-size: 4.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .main-title {
-    font-size: 3.5rem;
-    letter-spacing: -0.02em;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.3rem;
-  }
+  text-align: center;
 }
 
 .feature-grid {
@@ -425,13 +476,13 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
+  overflow-x: hidden;
 }
-
 .feature-card {
   position: relative;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 24px;
-  padding: 4rem 3rem;
+  padding: 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -440,9 +491,12 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   height: 100%;
-  min-height: 420px;
+  min-height: 320px;
   backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 }
+
 
 .feature-card::before {
   content: '';
@@ -478,10 +532,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 120px;
-  border-radius: 30px;
-  margin-bottom: 3rem;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  margin-bottom: 2rem;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -489,14 +543,7 @@
   z-index: 1;
 }
 
-.feature-icon .m-icon {
-  font-size: 4rem;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  transition: transform 0.4s ease;
-}
+
 
 .feature-card:hover {
   transform: translateY(-8px);
@@ -525,9 +572,9 @@
 }
 
 .feature-card h3 {
-  font-size: 2.8rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
   line-height: 1.2;
   letter-spacing: -0.5px;
   background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
@@ -535,16 +582,18 @@
   background-clip: text;
   color: transparent;
   transition: all 0.4s ease;
+  text-align: center;
 }
 
 .feature-card p {
-  font-size: 1.8rem;
-  line-height: 1.6;
+  font-size: 1.4rem;
+  line-height: 1.5;
   color: var(--text-secondary);
   margin: 0;
   max-width: 400px;
   font-weight: 400;
   transition: color 0.3s ease;
+  text-align: center;
 }
 
 .feature-card:hover h3 {
@@ -557,57 +606,46 @@
   color: var(--text-primary);
 }
 
-@media (max-width: 1200px) {
-  .feature-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    padding: 1.5rem;
-  }
-  
-  .feature-card {
-    padding: 3rem 2rem;
-    min-height: 380px;
-  }
-  
-  .feature-card h3 {
-    font-size: 2.2rem;
-  }
-  
-  .feature-card p {
-    font-size: 1.5rem;
-  }
+.benefits-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
-  .feature-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 1rem;
-  }
-  
-  .feature-card {
-    padding: 2.5rem 2rem;
-    min-height: 340px;
-  }
-  
-  .feature-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 2rem;
-  }
-  
-  .feature-icon .m-icon {
-    font-size: 2.8rem;
-  }
-  
-  .feature-card h3 {
-    font-size: 2rem;
-    margin-bottom: 1.2rem;
-  }
-  
-  .feature-card p {
-    font-size: 1.4rem;
-  }
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 180px;
+}
+
+.benefit .m-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.6rem;
+  border-radius: 50%;
+  background: rgba(79,172,254,0.08);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.benefit:nth-child(2) .m-icon {
+  background: rgba(0,242,254,0.08);
+}
+
+.benefit:nth-child(3) .m-icon {
+  background: rgba(123,104,238,0.08);
+}
+
+.benefit span {
+  font-size: 1.4rem;
 }
 
 .start-prompt {
@@ -616,62 +654,9 @@
   text-align: center;
 }
 
-@media (max-width: 1200px) {
-  .main-title {
-    font-size: 4rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 2rem;
-  }
-  
-  .feature-grid {
-    grid-template-columns: repeat(1, 1fr);
-    gap: 2rem;
-  }
-}
 
-@media (max-width: 768px) {
-  .landing-container {
-    padding: 1rem;
-  }
-  
-  .main-title {
-    font-size: 3.2rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-  }
-  
-  .feature-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 1rem;
-  }
-  
-  .feature-card {
-    padding: 2rem 1.5rem;
-  }
-  
-  .feature-icon {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .feature-icon .m-icon {
-    font-size: 2.8rem;
-  }
-  
-  .feature-card h3 {
-    font-size: 2rem;
-  }
-  
-  .feature-card p {
-    font-size: 1.4rem;
-  }
-}
+
+
 
 /* Enhanced Header Animations */
 .header {
@@ -706,25 +691,11 @@
   align-items: center;
 }
 
-.nav-title .weather-icon {
-  position: relative;
-  font-size: 3.8rem;
-  color: #fff;
-  font-weight: bold;
-  text-shadow: 
-    0 0 15px rgba(255, 255, 255, 0.5),
-    0 0 30px rgba(255, 255, 255, 0.3);
-  margin-right: 0.5em;
-}
-
 @media (max-width: 768px) {
   .nav-title {
-    font-size: 3.2rem;
-    letter-spacing: 3px;
-  }
-  
-  .nav-title .weather-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    letter-spacing: 2.5px;
+    margin-right: 0.3rem;
   }
 }
 
@@ -766,26 +737,7 @@
   transform: translateY(-50%) scale(1.1);
 }
 
-@media (max-width: 768px) {
-  .nav-title {
-    font-size: 2.5rem;
-    letter-spacing: 3px;
-    padding: 0 0 0 1.8em;
-  }
-  
-  .nav-title::before {
-    left: 1.8em;
-  }
-  
-  .nav-title::after {
-    left: 1.8em;
-    width: calc(100% - 1.8em);
-  }
-  
-  .nav-title .weather-icon {
-    font-size: 1.8rem;
-  }
-}
+
 
 .nav-title::before,
 .nav-title::after {
@@ -1075,7 +1027,27 @@
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
 }
-
+#ai-button, 
+.current-location-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    135deg,
+    rgba(28, 28, 28, 0.9),
+    rgba(35, 35, 35, 0.8)
+  );
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 @media (max-width: 768px) {
   .search-popup {
     width: 95%;
@@ -1092,6 +1064,7 @@
     padding: 0.8rem;
   }
 }
+
 
 /* Enhanced Button Animations */
 .btn-primary {
@@ -1490,7 +1463,7 @@
   content: '';
   position: absolute;
   inset: -4px;
-  border-radius: 50%;
+  border-radius: 20%;
   background: linear-gradient(45deg, #4facfe, #00f2fe, #7b68ee);
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1499,12 +1472,12 @@
 }
 
 .feature-icon .m-icon {
-  font-size: 3.5rem;
-  background: linear-gradient(45deg, #4facfe, #00f2fe, #7b68ee);
+  font-size: 2.8rem;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .feature-card:hover .feature-icon {
@@ -2819,10 +2792,7 @@
     margin-bottom: 1.5rem;
   }
   
-  .feature-card {
-    padding: 1.8rem 1.5rem;
-    min-height: 280px;
-  }
+  
   
   .feature-icon {
     width: 70px;
@@ -2870,16 +2840,145 @@
     gap: 2rem;
   }
 }
-
-/* Update grid spacing */
-.feature-grid {
-  gap: 2rem;
-  padding: 0 1rem;
-}
-
 @media (max-width: 768px) {
   .feature-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 400px);
+    justify-content: center;
     gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  .feature-card {
+    width: 100%;
+    /* no max-width here—column already caps at 400px */
+    box-sizing: border-box;
+    /* adjust mobile padding/height as you like: */
+    padding: 2rem;
+    min-height: auto;
+  }
+}
+@media (max-width: 480px) {
+  .landing-content {
+    padding: 1.5rem 0.75rem;
+    gap: 1.5rem;
+  }
+  
+  .main-title {
+    font-size: 2.8rem;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.2rem;
     padding: 0 0.5rem;
+  }
+  
+  .feature-card {
+    padding: 1.5rem 1rem;
+    max-width: 320px;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.4rem;
+  }
+  
+  .feature-card p {
+    font-size: 1.1rem;
+  }
+  
+  .nav-title {
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+  
+  .nav-title .weather-icon {
+    font-size: 2rem;
+  }
+  
+  /* Extra small screens popup adjustments */
+  .search-popup,
+  .assistant-popup {
+    width: 98%;
+    max-height: 98vh;
+    margin: 0.5rem;
+  }
+  
+  .assistant-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .search-content {
+    padding: 1rem;
+  }
+  
+  .search-field {
+    font-size: 1.3rem;
+    padding: 1.2rem 1.2rem 1.2rem 4rem;
+  }
+  
+  .search-input-wrapper .search-icon {
+    font-size: 1.8rem;
+    left: 1.2rem;
+  }
+  
+  .chat-input {
+    font-size: 1.3rem;
+    padding: 0.9rem 1.2rem;
+  }
+  
+  .chat-input::placeholder {
+    font-size: 1.3rem;
+  }
+  
+  .weather-stats {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  
+  .welcome-card {
+    padding: 1.5rem;
+  }
+  
+  .temperature-display {
+    font-size: 2.2rem;
+  }
+  
+  .weather-description {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 768px) {
+  .highlight-card {
+    padding: 2rem;
+  }
+  
+  .highlight-card .title-2 {
+    font-size: 2.4rem;
+  }
+  
+  .heading {
+    font-size: 3rem;
+  }
+  
+  .temperature-details {
+    font-size: 1rem;
+  }
+  
+  .border-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .border-icon .m-icon {
+    font-size: 2rem;
+  }
+  
+  .summary-card {
+    padding: 1.5rem;
+  }
+  
+  .slider-container {
+    padding: 0.5rem 0;
   }
 }

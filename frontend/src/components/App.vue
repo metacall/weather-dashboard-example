@@ -2207,17 +2207,7 @@ function getUvIndexRecommendation(value) {
   line-height: 1.4;
 }
 
-.feature-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin-top: 40px;
-  padding: 0 24px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-}
+
 
 .feature-card {
   position: relative;
@@ -2375,16 +2365,9 @@ function getUvIndexRecommendation(value) {
 }
 
 @media (max-width: 768px) {
-  .feature-grid {
-    padding: 0 16px;
-    max-width: 100%;
-    gap: 24px;
-  }
   
-  .feature-card {
-    padding: 28px;
-    border-radius: 24px;
-  }
+  
+  
   
   .feature-card h3 {
     font-size: 2rem;
@@ -2401,14 +2384,9 @@ function getUvIndexRecommendation(value) {
 }
 
 @media (max-width: 600px) {
-  .feature-grid {
-    padding: 0 12px;
-    gap: 20px;
-  }
   
-  .feature-card {
-    padding: 24px;
-  }
+  
+  
   
   .feature-stats {
     grid-template-columns: 1fr;
@@ -2651,6 +2629,7 @@ function getUvIndexRecommendation(value) {
 
 
 @media (max-width: 600px) {
+  
   .search-container {
     display: none !important;
   }
