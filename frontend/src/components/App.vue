@@ -202,65 +202,65 @@
         <div class="content-left" >
           <section class="section current-weather" aria-label="current weather">
             <div class="card card-lg current-weather-card">
-              <h2 class="title-2 card-title">Now</h2>
-              <div class="wrapper">
-                <div class="temperature-container">
-                  <p class="heading">{{ Math.floor(weather?.main?.temp) }}&deg;c</p>
-                  <div class="temperature-details">
-                    <span class="temp-min">↓ {{ Math.floor(weather?.main?.temp_min) }}&deg;</span>
-                    <span class="temp-max">↑ {{ Math.floor(weather?.main?.temp_max) }}&deg;</span>
+                <h2 class="title-2 card-title">Now</h2>
+                <div class="wrapper">
+                  <div class="temperature-container">
+                    <p class="heading">{{ Math.floor(weather?.main?.temp) }}&deg;c</p>
+                    <div class="temperature-details">
+                      <span class="temp-min">↓ {{ Math.floor(weather?.main?.temp_min) }}&deg;</span>
+                      <span class="temp-max">↑ {{ Math.floor(weather?.main?.temp_max) }}&deg;</span>
+                    </div>
+                  </div>
+                  <div class="weather-icon-container">
+                    <img 
+                      :src="getWeatherIcon(weather.weather[0].icon)" 
+                      alt="Weather Icon" 
+                      class="weather-icon" 
+                      width="64" 
+                      height="64"
+                      :class="weather.weather[0].main.toLowerCase()"
+                    />
                   </div>
                 </div>
-                <div class="weather-icon-container">
-                  <img 
-                    :src="getWeatherIcon(weather.weather[0].icon)" 
-                    alt="Weather Icon" 
-                    class="weather-icon" 
-                    width="64" 
-                    height="64"
-                    :class="weather.weather[0].main.toLowerCase()"
-                  />
-                </div>
-              </div>
-              <p class="body-3 weather-description">{{ weather.weather[0].description }}</p>
-              <ul class="meta-list">
-                <li class="meta-item">
-                  <span class="m-icon">calendar_today</span>
-                  <p class="title-3 meta-text">{{ formatUnixTime(weather.dt) }}</p>
-                </li>
-                <li class="meta-item">
-                  <span class="m-icon">location_on</span>
-                  <p class="title-3 meta-text">{{ weather.name }}, {{ weather.sys.country }}</p>
-                </li>
-              </ul>
+                <p class="body-3 weather-description">{{ weather.weather[0].description }}</p>
+                <ul class="meta-list">
+                  <li class="meta-item">
+                    <span class="m-icon">calendar_today</span>
+                    <p class="title-3 meta-text">{{ formatUnixTime(weather.dt) }}</p>
+                  </li>
+                  <li class="meta-item">
+                    <span class="m-icon">location_on</span>
+                    <p class="title-3 meta-text">{{ weather.name }}, {{ weather.sys.country }}</p>
+                  </li>
+                </ul>
             </div>
           </section>
 
           <!-- New Moon Phase Card -->
           <section class="section moon-phase" aria-label="moon phase">
             <div class="card card-lg moon-phase-card">
-              <h2 class="title-2 card-title">Moon Phase</h2>
-              <div class="wrapper" style="flex-direction: column; align-items: center; gap: 8px;">
-                <svg :width="64" :height="64" viewBox="0 0 64 64">
-                  <defs>
-                    <radialGradient id="moonGradient" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#fffbe6"/>
-                      <stop offset="100%" stop-color="#bdbdbd"/>
-                    </radialGradient>
-                  </defs>
-                  <!-- Full moon -->
-                  <circle cx="32" cy="32" r="24" fill="url(#moonGradient)" />
-                  <!-- Shadow (phase) -->
-                  <ellipse
-                    v-if="moonPhaseEllipse.rx > 0"
-                    :cx="moonPhaseEllipse.cx"
-                    cy="32"
-                    :rx="moonPhaseEllipse.rx"
-                    ry="24"
-                    fill="#131214"
-                  />
-                </svg>
-                <p class="title-3" style="margin-top: 8px;">{{ moonPhaseName }}</p>
+                <h2 class="title-2 card-title">Moon Phase</h2>
+                <div class="wrapper" style="flex-direction: column; align-items: center; gap: 8px;">
+                  <svg :width="64" :height="64" viewBox="0 0 64 64">
+                    <defs>
+                      <radialGradient id="moonGradient" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#fffbe6"/>
+                        <stop offset="100%" stop-color="#bdbdbd"/>
+                      </radialGradient>
+                    </defs>
+                    <!-- Full moon -->
+                    <circle cx="32" cy="32" r="24" fill="url(#moonGradient)" />
+                    <!-- Shadow (phase) -->
+                    <ellipse
+                      v-if="moonPhaseEllipse.rx > 0"
+                      :cx="moonPhaseEllipse.cx"
+                      cy="32"
+                      :rx="moonPhaseEllipse.rx"
+                      ry="24"
+                      fill="#131214"
+                    />
+                  </svg>
+                  <p class="title-3" style="margin-top: 8px;">{{ moonPhaseName }}</p>
               </div>
             </div>
           </section>
@@ -268,16 +268,16 @@
           <section class="section forecast" aria-labelledby="forecast-label">
             <h2 class="title-2" id="forecast-label">5 Days Forecast</h2>
             <div class="card card-lg forecast-card">
-              <ul>
-                <li v-for="day in forecast" :key="day.date" class="card-item">
-                  <div class="icon-wrapper">
-                    <img :src="getWeatherIcon(day.icon)" alt="Forecast Icon" class="weather-icon" width="36" height="36" />
-                    <span class="title-2">{{ day.temp }}&deg;</span>
-                  </div>
-                  <p class="label-1">{{ day.day_n }} {{ day.month }}</p>
-                  <p class="label-1">{{ day.week_day }}</p>
-                </li>
-              </ul>
+                <ul>
+                  <li v-for="day in forecast" :key="day.date" class="card-item">
+                    <div class="icon-wrapper">
+                      <img :src="getWeatherIcon(day.icon)" alt="Forecast Icon" class="weather-icon" width="36" height="36" />
+                      <span class="title-2">{{ day.temp }}&deg;</span>
+                    </div>
+                    <p class="label-1">{{ day.day_n }} {{ day.month }}</p>
+                    <p class="label-1">{{ day.week_day }}</p>
+                  </li>
+                </ul>
             </div>
           </section>
         </div>
@@ -323,7 +323,7 @@
                     {{ air_quality ? getAqiMessage(air_quality.aqi) : 'Loading...' }}
                   </span>
                 </div>
-                
+
                 <div class="card card-sm highlight-card two">
                   <h3 class="title-3">
                     Sunrise & Sunset
@@ -505,15 +505,15 @@
                       {{ (weather.main && typeof weather.main.temp === 'number' && typeof weather.main.humidity === 'number')
                         ? calculateDewPoint(weather.main.temp, weather.main.humidity).toFixed(1) : 'N/A' }}°C
                     </p>
+                    </div>
                   </div>
-                </div>
 
                 <div class="card card-sm highlight-card">
                   <h3 class="title-3">Wind Gusts</h3>
                   <div class="wrapper">
                     <span class="m-icon">air</span>
                     <p class="title-1">{{ weather.wind.gust ? Math.floor(weather.wind.gust) : '0' }} m/s</p>
-                  </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -2367,7 +2367,10 @@ function getUvIndexRecommendation(value) {
 @media (max-width: 768px) {
   
   
-  
+  .feature-card {
+    padding: 28px;
+    border-radius: 24px;
+  }
   
   .feature-card h3 {
     font-size: 2rem;
@@ -2386,7 +2389,9 @@ function getUvIndexRecommendation(value) {
 @media (max-width: 600px) {
   
   
-  
+  .feature-card {
+    padding: 24px;
+  }
   
   .feature-stats {
     grid-template-columns: 1fr;
