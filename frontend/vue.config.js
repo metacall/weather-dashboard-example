@@ -7,7 +7,7 @@ module.exports = {
     ignoreWarnings: [/Module not found/]
   },
   pwa: {
-    name: 'My Weather Dashboard',
+    name: 'Climatic',
     themeColor: '#4DBA87',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
