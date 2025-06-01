@@ -1,20 +1,13 @@
 // weatherHandler.js
 const axios = require("axios");
-const { WEATHER_API_KEY } = require("../main");
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 // Use the environment variable directly
-
-
-
 
 const searchHandler = async (req, res) => {
    const { city } = req.body;
     if (!city) {
         return res.status(400).json({ error: "City name is required" });
     }
-    
-
-    
-
   
     try {
         

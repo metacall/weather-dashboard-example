@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { WEATHER_API_KEY } = require("../main");
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
 // Forecast Using open weather to get 5 days forecast
 const forecastHandler = async (req, res) => {
@@ -21,7 +21,7 @@ const forecastHandler = async (req, res) => {
             pop: item.pop
         }));
         
-        console.table(forecast);
+        
 
         
 

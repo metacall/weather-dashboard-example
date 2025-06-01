@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { WEATHER_API_KEY } = require("../main");
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 // Get Air Quality Data From open weather api
 const AirQualityHandler = async (req, res) => {
     const cityName = req.body.city; // Correctly extract city from body

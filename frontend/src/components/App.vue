@@ -1423,7 +1423,7 @@ async function sendMessage() {
     assistantMessageDiv.classList.add('message-bubble', 'assistant');
 
     // Call the real API
-    const response = await fetch('http://localhost:5000/gemini-assistant', {
+    const response = await fetch('http://localhost:5000/assistant', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 

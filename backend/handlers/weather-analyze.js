@@ -1,7 +1,8 @@
 const axios = require("axios");
-const { metacall } = require("metacall");
-const { WEATHER_API_KEY } = require("../main");
+require("metacall");
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
+const weather = require('../weather_analytics.py'); // Assuming this is the Python script for weather analytics
 
 const weatherAnalyzeHandler = async (req, res) => {
     try {
@@ -14,7 +15,8 @@ const weatherAnalyzeHandler = async (req, res) => {
         
 
         // Call Python Function via MetaCall
-        const analytics = await metacall("get_weather_stats", weatherData);
+       const analytics = await weather.get_weather_stats(weatherData);
+       
 
         const forecast = weatherData.list.slice(0, 5).map(item => ({
             date: new Date(item.dt * 1000).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }),
@@ -42,6 +44,7 @@ const weatherAnalyzeHandler = async (req, res) => {
             },
             language: analytics.language
         });
+        
     } catch (error) {
         console.error("Error fetching weather data:", error);
         res.status(500).json({ error: "Failed to fetch weather data" });

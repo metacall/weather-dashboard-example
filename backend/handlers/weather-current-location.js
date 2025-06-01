@@ -1,4 +1,4 @@
-const { WEATHER_API_KEY } = require("../main");
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 //use the geo location of the user
 const CurrentLocationHandler = async (req, res) => {
     
