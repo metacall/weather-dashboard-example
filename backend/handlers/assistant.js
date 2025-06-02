@@ -1,5 +1,6 @@
 
 const { GoogleGenAI } = require("@google/genai");
+const { loggers } = require("winston");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -100,7 +101,7 @@ const AssistantHandler = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while processing your request.',
