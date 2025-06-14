@@ -7,9 +7,7 @@ const logger = require("./logger");
 const PORT = process.env.PORT || 5000; 
 app.use(cors());
 app.use(express.json());
-require("metacall");
 require('dotenv').config();// OpenWeather Api Key
-
 const handlersDir = path.join(__dirname, "handlers");
 logger.info("🛠️  Setting up routes...");
 fs.readdirSync(handlersDir).forEach((file) => { // loop through the files and create routes with the filename

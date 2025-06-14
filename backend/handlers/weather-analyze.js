@@ -2,7 +2,7 @@ const axios = require("axios");
 require("metacall");
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const FORECAST_API_URL = "https://api.openweathermap.org/data/2.5/forecast";
-const weather = require('../weather_analytics.py'); // Assuming this is the Python script for weather analytics
+const weather = require('./weather_analytics.py'); // Assuming this is the Python script for weather analytics
 
 const weatherAnalyzeHandler = async (req, res) => {
     try {

@@ -22,7 +22,6 @@ const searchHandler = async (req, res) => {
       if (!response.data || response.data.length === 0) {
         return res.status(404).json({ error: "No cities found" });
       }
-      console.log(WEATHER_API_KEY)
   
       const cities = response.data.map(city => ({
         name: city.name,

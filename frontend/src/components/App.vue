@@ -23,68 +23,16 @@
       </div>
     </div>
     
-    <header class="header" :class="{ 'header-blur': isHeaderBlur }">
-      <div class="container">
-        <a href="/" class="logo" @click.prevent="resetToLanding">
-          <h1 class="nav-title">
-            <span class="weather-animated-logo-gradient">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- All white sun and cloud -->
-                <g class="sun-group">
-                  <circle cx="20" cy="20" r="12" fill="#fff"/>
-                  <ellipse cx="20" cy="34" rx="10" ry="2.5" fill="#fff" opacity="0.18"/>
-                </g>
-                <g class="gradient-cloud-group">
-                  <ellipse cx="26" cy="26" rx="8" ry="5" fill="#fff" fill-opacity="0.92" stroke="#bdbdbd" stroke-width="2"/>
-                  <ellipse cx="32" cy="28" rx="5" ry="3" fill="#fff" fill-opacity="0.7" stroke="#bdbdbd" stroke-width="2"/>
-                </g>
-              </svg>
-            </span>
-            Climatic
-          </h1>
-        </a>
-        <div class="search-container">
-          <div class="search-box" @click="isSearchActive = true">
-            <span class="m-icon search-icon">search</span>
-            <span class="search-placeholder">Search city...</span>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button 
-            id="ai-button" 
-            class="btn-primary has-state" 
-            @click="() => { 
-              isAssistantActive = true; 
-              fetchWeatherAnalysis();
-              chatMessages = []; // Clear previous messages
-            }"  
-            data-current-location-btn 
-            :disabled="isnotReady"
-          >
-            <span class="m-icon">bolt</span>
-            <span class="span">Weather Assistant</span>
-          </button>
-          <!-- Mobile search button (≤400px) -->
-          <button
-            class="btn-primary search-btn"
-            @click="isSearchActive = true"
-            aria-label="Search"
-          >
-            <span class="m-icon search-icon">search</span>
-          </button>
-          <button
-            class="btn-primary has-state current-location-btn"
-            @click.prevent="fetchForCurrentLocation" 
-            :disabled="isdisabled"
-            :class="{ 'current-location-active': isCurrentLocation }"
-          >
-            <span class="m-icon">my_location</span>
-            <span class="span">Current Location</span>
-          </button>
-        
-        </div>
-      </div>
-    </header>
+    <WeatherNavbar
+      :is-header-blur="isHeaderBlur"
+      :is-not-ready="isnotReady"
+      :is-disabled="isdisabled"
+      :is-current-location="isCurrentLocation"
+      @reset="resetToLanding"
+      @search-click="isSearchActive = true"
+      @assistant-click="assistant.isActive = true"
+      @current-location-click="fetchForCurrentLocation"
+    />
    
     <main v-if="!weather">
       <div class="landing-container">
@@ -241,23 +189,35 @@
             <div class="card card-lg moon-phase-card">
                 <h2 class="title-2 card-title">Moon Phase</h2>
                 <div class="wrapper" style="flex-direction: column; align-items: center; gap: 8px;">
+                  <!-- Moon Phase Card SVG -->
                   <svg :width="64" :height="64" viewBox="0 0 64 64">
                     <defs>
                       <radialGradient id="moonGradient" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stop-color="#fffbe6"/>
                         <stop offset="100%" stop-color="#bdbdbd"/>
                       </radialGradient>
+                      <clipPath id="moonClip">
+                        <circle cx="32" cy="32" r="24" />
+                      </clipPath>
                     </defs>
-                    <!-- Full moon -->
+                    <!-- Full moon base -->
                     <circle cx="32" cy="32" r="24" fill="url(#moonGradient)" />
                     <!-- Shadow (phase) -->
-                    <ellipse
-                      v-if="moonPhaseEllipse.rx > 0"
-                      :cx="moonPhaseEllipse.cx"
+                    <circle
+                      v-if="moonPhase < 0.5"
+                      :cx="32 + 24 * (1 - 2 * moonPhase)"
                       cy="32"
-                      :rx="moonPhaseEllipse.rx"
-                      ry="24"
+                      r="24"
                       fill="#131214"
+                      :clip-path="'url(#moonClip)'"
+                    />
+                    <circle
+                      v-else
+                      :cx="32 - 24 * (2 * moonPhase - 1)"
+                      cy="32"
+                      r="24"
+                      fill="#131214"
+                      :clip-path="'url(#moonClip)'"
                     />
                   </svg>
                   <p class="title-3" style="margin-top: 8px;">{{ moonPhaseName }}</p>
@@ -415,7 +375,7 @@
                             {{ getUvIndexLevel(uvIndex) }}
                           </span>
                         </div>
-                        <p class="uv-recommendation">{{ getUvIndexRecommendation(uvIndex) }}</p>
+                        <p class="label-1">{{ getUvIndexRecommendation(uvIndex) }}</p>
                       </div>
                     </div>
                   </div>
@@ -434,32 +394,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-          <!-- Weather News Card -->
-          <section v-if="isLoadingNews || newsHeadlines.length > 0" class="section weather-news" aria-label="weather news">
-            <div class="card card-lg weather-news-card">
-              <h2 class="title-2 card-title">Weather News
-                 <button class="refresh-btn" :disabled="isLoadingNews" @click="fetchNews" title="Refresh news">
-                   <span class="m-icon">refresh</span>
-                 </button>
-               </h2>
-             <ul class="news-list">
-               <li v-if="isLoadingNews" class="news-item">
-                 <span class="m-icon" style="color:#2196f3;">autorenew</span>
-                 <div class="news-content">
-                   <p class="title-3">Loading news...</p>
-                 </div>
-               </li>
-               <li v-else v-for="item in newsHeadlines" :key="item.url" class="news-item">
-                 <span class="m-icon" style="color:#2196f3;">article</span>
-                 <div class="news-content">
-                   <p class="title-3">{{ item.title }}</p>
-                   <p class="label-2">{{ item.source.name }}</p>
-                   <a :href="item.url" class="read-more" target="_blank">Read More</a>
-                 </div>
-               </li>
-             </ul>
             </div>
           </section>
           <section class="section additional-weather" aria-labelledby="additional-weather-label">
@@ -661,111 +595,41 @@
       </div>
     </div>
 
-    <div class="assistant-overlay" :class="{ 'active': isAssistantActive }">
-      <div class="assistant-popup">
-        <div class="assistant-header">
-          <h2 class="assistant-title">Weather Assistant</h2>
-          <button 
-            class="icon-btn close-btn" 
-            aria-label="close assistant"
-            @click="isAssistantActive = false"
-          >
-            <span class="m-icon">close</span>
-          </button>
-        </div>
-        <div class="assistant-content">
-          <div v-if="!assistantResponse" class="assistant-loading">
-            <div class="loading-circle"></div>
-            <p>Analyzing weather data...</p>
-          </div>
-          <div v-else class="assistant-response">
-            <!-- Welcome Card -->
-            <div class="welcome-card">
-              <div class="welcome-header">
-                <h3>Hello! Here's your weather update for today:</h3>
-              </div>
-              <div class="weather-display" v-if="weather && weather.weather && weather.weather[0]">
-                <img 
-                  :src="getWeatherIcon(weather.weather[0].icon)" 
-                  alt="Weather Icon" 
-                  class="weather-icon-large" 
-                  width="80" 
-                  height="80"
-                />
-                <div class="temperature-display">
-                  {{ Math.floor(weather.main.temp) }}°C
-                </div>
-                <p class="weather-description">{{ weather.weather[0].description }}</p>
-              </div>
-              <div class="weather-stats" v-if="weather && weather.main">
-                <div class="stat-card">
-                  <span class="m-icon">arrow_upward</span>
-                  <p class="stat-value">{{ Math.floor(weather.main.temp_max) }}°C</p>
-                  <p class="stat-label">High</p>
-                </div>
-                <div class="stat-card">
-                  <span class="m-icon">arrow_downward</span>
-                  <p class="stat-value">{{ Math.floor(weather.main.temp_min) }}°C</p>
-                  <p class="stat-label">Low</p>
-                </div>
-                <div class="stat-card">
-                  <span class="m-icon">air</span>
-                  <p class="stat-value">{{ weather.wind.speed }} m/s</p>
-                  <p class="stat-label">Wind</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Chat Messages -->
-            <div class="chat-messages" ref="chatContainer" @scroll="handleScroll">
-              <div class="message-bubble assistant">
-                <div class="message-content">
-                  Hello! I'm your weather assistant. How can I help you today?
-                </div>
-              </div>
-            </div>
-
-            <!-- Scroll to Bottom Button -->
-            <button 
-              v-if="showScrollButton" 
-              class="scroll-to-bottom-btn" 
-              @click="smartScrollToBottom"
-              aria-label="Scroll to bottom"
-            >
-              <span class="m-icon">arrow_downward</span>
-            </button>
-
-            <!-- Chat Input -->
-            <div class="chat-input-container">
-              <input 
-                type="text" 
-                v-model="userMessage" 
-                placeholder="Ask about the weather..." 
-                @keyup.enter="sendMessage"
-                class="chat-input"
-              />
-              <button 
-                class="send-button" 
-                @click="sendMessage"
-                :disabled="!userMessage.trim()"
-              >
-                <span class="m-icon">send</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AssistantOverlay
+      :is-active="assistant.isActive"
+      :assistant-response="assistant.response"
+      :weather="weather"
+      :user-message="assistant.userMessage"
+      :chat-messages="assistant.chatMessages"
+      :get-weather-icon="getWeatherIcon"
+      @close="assistant.isActive = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { useWeatherApp } from '@/weather.js';
-import { ref, onMounted, defineEmits, onUnmounted, watch, nextTick, computed } from "vue";
+import { weatherUtils } from '@/weather-utils.js';
+const {
+    getAqiMessage,
+    getWeatherIcon,
+    formatUnixTime,
+    formatTime,
+    getWindDirection,
+    getMoonPhase,
+    getUvIndexClass,
+    getUvIndexLevel,
+    getUvIndexRecommendation,
+    calculateDewPoint,
+    getCityName
+} = weatherUtils();
+import WeatherNavbar from './Navbar.vue';
+import { ref, onMounted, defineEmits, onUnmounted, watch, nextTick, computed, reactive } from "vue";
 import _debounce from 'lodash.debounce';
 import axios from 'axios';
 import { Chart, registerables } from 'chart.js';
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+import AssistantOverlay from './AssistantOverlay.vue';
+
 
 const emit = defineEmits(['city-selected']);
 
@@ -774,13 +638,6 @@ Chart.register(...registerables);
 const SearchInput = _debounce(() => {
   searchCities();
 }, 300);
-
-const {
-  getWeatherIcon,
-  getAqiMessage,
-  formatTime,
-  formatUnixTime
-} = useWeatherApp();
 
 const isnotReady = ref(true);
 const city = ref("");
@@ -808,18 +665,13 @@ const forecastData = ref([]);
 const isLocationLoading = ref(false);
 const locationTimeout = ref(null);
 
-const isAssistantActive = ref(false);
-const assistantResponse = ref(null);
+const assistant = reactive({
+  isActive: false,
+  response: null,
+  userMessage: '',
+  chatMessages: []
+});
 
-const userMessage = ref('');
-const chatMessages = ref([]);
-
-const chatContainer = ref(null);
-const showScrollButton = ref(false);
-const isNearBottom = ref(true);
-const scrollThreshold = 100; // pixels from bottom to consider "near bottom"
-
-// Header blur on scroll
 const isHeaderBlur = ref(false);
 function handleHeaderScroll() {
   isHeaderBlur.value = window.scrollY > 10;
@@ -829,13 +681,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   window.removeEventListener('scroll', handleHeaderScroll);
-});
-
-// Reset chat messages when assistant is opened
-watch(isAssistantActive, (newValue) => {
-  if (newValue) {
-    chatMessages.value = []; // Reset to empty array
-  }
 });
 
 const uvIndex = ref(null);
@@ -1106,20 +951,6 @@ async function fetchForCurrentLocation() {
   );
 }
 
-async function getCityName(lat, lon) {
-  console.log("lat",lat, "lon",lon)
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.address.city || data.address.town || data.address.village || data.address.county || data.address.state;
-
-  } catch (error) {
-    console.error("Error fetching city name:", error);
-    return null;
-  }
-}
 async function fetchForecast(city) {
   const cityName = (typeof city === "object" && city.value) ? city.value : city;
 
@@ -1280,7 +1111,7 @@ const fetchWeatherAnalysis = async () => {
     
     if (data && data.analytics && data.analytics.summary) {
       weatherSummary.value = data;
-      assistantResponse.value = data;
+      assistant.response = data;
       // Send initial weather message
       await sendInitialWeatherMessage();
       console.log("Updated weather summary:", weatherSummary.value);
@@ -1297,7 +1128,6 @@ const fetchWeatherAnalysis = async () => {
   }
 };
 
-// Add this function
 async function sendInitialWeatherMessage() {
   if (!weather.value || !weather.value.weather || !weather.value.weather[0] || !weather.value.main) {
     console.warn('Weather data not available for initial message');
@@ -1307,7 +1137,7 @@ async function sendInitialWeatherMessage() {
   const message = `Current weather in ${weather.value.name}: ${Math.floor(weather.value.main.temp)}°C, ${weather.value.weather[0].description}.`;
   
   // Ensure chatMessages is an array and add the message
-  chatMessages.value = Array.isArray(chatMessages.value) ? [...chatMessages.value, {
+  assistant.chatMessages = Array.isArray(assistant.chatMessages) ? [...assistant.chatMessages, {
     type: 'assistant',
     text: message
   }] : [{
@@ -1348,11 +1178,13 @@ onMounted(() => {
   });
 });
 
-const resetToLanding = () => {
+const resetToLanding = async () => {
   weather.value = null
   isSearchActive.value = false
+  isnotReady.value = true
+  isdisabled.value = false
+  isCurrentLocation.value = false
 }
-
 // Add cleanup for loading timeout
 onUnmounted(() => {
   if (loadingTimeout.value) {
@@ -1360,290 +1192,10 @@ onUnmounted(() => {
   }
 });
 
-async function smartScrollToBottom() {
-  if (!chatContainer.value) {
-    console.log("gg")
-  } 
-  
-  requestAnimationFrame(() => {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-    console.log("zingy")
-
-    showScrollButton.value = false;
-    isNearBottom.value = true;
-  });
-}
-
-async function sendMessage() {
-  if (!userMessage.value.trim()) return;
-
-  try {
-    // Get the chat container
-    const chatContainer = document.querySelector('.chat-messages');
-    if (!chatContainer) return;
-
-    // Add user message
-    const userMessageDiv = document.createElement('div');
-    userMessageDiv.classList.add('message-bubble', 'user');
-    userMessageDiv.innerHTML = `
-      <div class="message-content user-message" style="
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        background: rgba(79, 172, 254, 0.2);
-        border: 1px solid rgba(79, 172, 254, 0.3);
-        color: #fff;
-        backdrop-filter: blur(5px);
-        max-width: 80%;
-        word-wrap: break-word;
-        margin-left: auto;
-        margin-right: 1rem;
-      ">
-        ${userMessage.value}
-      </div>
-    `;
-    chatContainer.appendChild(userMessageDiv);
-    
-    // Check if we should auto-scroll
-    if (isNearBottom.value) {
-      
-      requestAnimationFrame(() => {
-        
-        console.log("Before scroll:", chatContainer.scrollTop);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        console.log("After scroll:", chatContainer.scrollTop);
-      });
-    }
-
-    // Save and clear input
-    const messageToSend = userMessage.value;
-    userMessage.value = '';
-
-    // Create assistant message div
-    const assistantMessageDiv = document.createElement('div');
-    assistantMessageDiv.classList.add('message-bubble', 'assistant');
-
-    // Call the real API
-    const response = await fetch('http://localhost:5000/assistant', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userQuestion: messageToSend,
-        currentLocation: weather.value?.name || null
-      })
-    });
-
-    let assistantText = '';
-    let formattedMessage = ''; // Declare formattedMessage at the top level of the function
-    if (response.ok) {
-      const data = await response.json();
-      if (data.success && data.message) {
-        // Convert markdown to HTML and format the response
-        formattedMessage = data.message
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
-          .replace(/\n\n/g, '</p><p>')
-          .replace(/\n\*/g, '</p><p class="bullet">•')
-          .trim();
-
-        assistantText = `
-          <div class="assistant-response-content typing-effect">
-            <p>${formattedMessage}</p>
-          </div>
-        `;
-      } else {
-        formattedMessage = data.reply || data.response || JSON.stringify(data);
-        assistantText = formattedMessage;
-      }
-    } else {
-      formattedMessage = 'Sorry, I could not get a response from the assistant.';
-      assistantText = formattedMessage;
-    }
-
-    // Add assistant response
-    assistantMessageDiv.innerHTML = `
-      <div class="message-content" style="
-        padding: 1.5rem;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #fff;
-        backdrop-filter: blur(5px);
-        max-width: 100%;
-        word-wrap: break-word;
-      ">
-        ${assistantText}
-      </div>
-    `;
-    chatContainer.appendChild(assistantMessageDiv);
-    
-    // Check if we should auto-scroll after adding the assistant message
-    if (isNearBottom.value) {
-      requestAnimationFrame(() => {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      });
-    }
-
-    // Add typing animation
-    const typingContent = assistantMessageDiv.querySelector('.typing-effect');
-    if (typingContent) {
-      const tempElement = document.createElement('div');
-      tempElement.innerHTML = assistantText;
-      const textContent = tempElement.textContent;
-      const words = textContent.split(' ');
-      typingContent.textContent = '';
-      typingContent.classList.add('typing');
-      
-      let wordIndex = 0;
-      let currentText = '';
-
-      const typeNextWord = () => {
-        if (wordIndex < words.length) {
-          currentText += (wordIndex > 0 ? ' ' : '') + words[wordIndex];
-          typingContent.textContent = currentText;
-          wordIndex++;
-          
-          // Check if we should auto-scroll during typing
-          if (isNearBottom.value) {
-            requestAnimationFrame(() => {
-              chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
-          }
-          
-          // Random delay between words for natural feel
-          const delay = Math.random() * (80 - 40) + 40; // Between 40ms and 80ms
-          setTimeout(typeNextWord, delay);
-        } else {
-          typingContent.classList.remove('typing');
-          // Restore HTML formatting after typing is complete
-          typingContent.innerHTML = formattedMessage;
-          
-          // Final scroll check after typing is complete
-          if (isNearBottom.value) {
-            requestAnimationFrame(() => {
-              chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
-          }
-        }
-      };
-
-      typeNextWord();
-    }
-  } catch (error) {
-    console.error('Error in sendMessage:', error);
-    const errorDiv = document.createElement('div');
-    errorDiv.classList.add('message-bubble', 'assistant');
-    errorDiv.innerHTML = `
-      <div class="message-content" style="
-        padding: 1rem;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #fff;
-        backdrop-filter: blur(5px);
-        max-width: 100%;
-        word-wrap: break-word;
-      ">
-        An error occurred. Please try again later.
-      </div>
-    `;
-    const chatContainer = document.querySelector('.chat-messages');
-    if (chatContainer) {
-      chatContainer.appendChild(errorDiv);
-      
-      // Check if we should auto-scroll after error message
-      if (isNearBottom.value) {
-        requestAnimationFrame(() => {
-          chatContainer.scrollTop = chatContainer.scrollHeight;
-        });
-      }
-    }
-  }
-}
-
-// Initialize chat with welcome message
-
-// Function to check if user is near the bottom of the chat
-function isUserNearBottom() {
-  if (!chatContainer.value) return true;
-  
-  const { scrollTop, scrollHeight, clientHeight } = chatContainer.value;
-  const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-  
-  return distanceFromBottom < scrollThreshold;
-}
-
-// Handle scroll events to show/hide the scroll button
-function handleScroll() {
-  isNearBottom.value = isUserNearBottom();
-  showScrollButton.value = !isNearBottom.value;
-}
-
-// Watch for changes in chat messages and auto-scroll if near bottom
-watch(chatMessages, () => {
-  if (isNearBottom.value) {
-    nextTick(() => {
-      requestAnimationFrame(() => {
-        if (chatContainer.value) {
-          chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-        }
-      });
-    });
-  }
-});
-
-function getWindDirection(degrees) {
-  const directions = [
-    { short: 'N', full: 'North', description: 'Blowing from the North' },
-    { short: 'NNE', full: 'North-Northeast', description: 'Blowing from the North-Northeast' },
-    { short: 'NE', full: 'Northeast', description: 'Blowing from the Northeast' },
-    { short: 'ENE', full: 'East-Northeast', description: 'Blowing from the East-Northeast' },
-    { short: 'E', full: 'East', description: 'Blowing from the East' },
-    { short: 'ESE', full: 'East-Southeast', description: 'Blowing from the East-Southeast' },
-    { short: 'SE', full: 'Southeast', description: 'Blowing from the Southeast' },
-    { short: 'SSE', full: 'South-Southeast', description: 'Blowing from the South-Southeast' },
-    { short: 'S', full: 'South', description: 'Blowing from the South' },
-    { short: 'SSW', full: 'South-Southwest', description: 'Blowing from the South-Southwest' },
-    { short: 'SW', full: 'Southwest', description: 'Blowing from the Southwest' },
-    { short: 'WSW', full: 'West-Southwest', description: 'Blowing from the West-Southwest' },
-    { short: 'W', full: 'West', description: 'Blowing from the West' },
-    { short: 'WNW', full: 'West-Northwest', description: 'Blowing from the West-Northwest' },
-    { short: 'NW', full: 'Northwest', description: 'Blowing from the Northwest' },
-    { short: 'NNW', full: 'North-Northwest', description: 'Blowing from the North-Northwest' }
-  ];
-  
-  const index = Math.round(degrees / 22.5) % 16;
-  const direction = directions[index];
-  
-  return {
-    short: direction.short,
-    full: direction.full,
-    description: direction.description,
-    degrees: degrees
-  };
-}
-
-function calculateDewPoint(tempC, humidity) {
-  const a = 17.27;
-  const b = 237.7;
-  const alpha = ((a * tempC) / (b + tempC)) + Math.log(humidity / 100);
-  const dewPoint = (b * alpha) / (a - alpha);
-  return dewPoint;
-}
-
-// Moon phase calculation
-function getMoonPhase(date = new Date()) {
-  // Simple moon phase calculation (0=new, 0.5=full)
-  const lp = 2551443; // lunar period in seconds
-  const now = date.getTime() / 1000;
-  const new_moon = new Date(2001, 0, 24, 13, 35, 0).getTime() / 1000;
-  const phase = ((now - new_moon) % lp) / lp;
-  return phase;
-}
-
 const moonPhase = computed(() => getMoonPhase());
-
 const moonPhaseName = computed(() => {
   const phase = moonPhase.value;
+  console.log("phase",phase)
   if (phase < 0.03 || phase > 0.97) return 'New Moon';
   if (phase < 0.22) return 'Waxing Crescent';
   if (phase < 0.28) return 'First Quarter';
@@ -1653,1020 +1205,4 @@ const moonPhaseName = computed(() => {
   if (phase < 0.78) return 'Last Quarter';
   return 'Waning Crescent';
 });
-
-// Realistic moon shadow ellipse calculation
-const moonPhaseEllipse = computed(() => {
-  // 0 = new, 0.5 = full, 1 = new
-  const phase = moonPhase.value;
-  // For new moon, shadow covers all; for full moon, shadow is gone
-  if (phase < 0.03 || phase > 0.97) {
-    return { cx: 32, rx: 24 }; // fully shadowed
-  }
-  if (phase < 0.5) {
-    // Waxing: shadow on left, shrinks as phase increases
-    return {
-      cx: 32 - 24 * (1 - 2 * phase),
-      rx: 24 * (1 - 2 * phase)
-    };
-  } else {
-    // Waning: shadow on right, grows as phase increases
-    return {
-      cx: 32 + 24 * (2 * phase - 1),
-      rx: 24 * (2 * phase - 1)
-    };
-  }
-});
-
-// Weather News API integration
-const newsHeadlines = ref([]);
-const isLoadingNews = ref(false);
-const newsError = ref('');
-
-async function fetchNews() {
-  isLoadingNews.value = true;
-  newsError.value = '';
-  try {
-    // Replace YOUR_API_KEY with your NewsAPI.org API key
-    const apiKey = 'YOUR_API_KEY';
-    const url = `https://newsapi.org/v2/everything?q=weather%20OR%20storm%20OR%20rain%20OR%20heatwave%20OR%20flood%20OR%20snow&language=en&sortBy=publishedAt&pageSize=3&apiKey=${apiKey}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch news');
-    const data = await response.json();
-    if (data.status !== 'ok') throw new Error(data.message || 'Failed to fetch news');
-    newsHeadlines.value = data.articles;
-  } catch (err) {
-    newsError.value = err.message || 'Failed to fetch news.';
-    newsHeadlines.value = [];
-  } finally {
-    isLoadingNews.value = false;
-  }
-}
-
-onMounted(fetchNews);
-
-function getUvIndexClass(value) {
-  if (value === null) return 'uv-low';
-  if (value <= 2) return 'uv-low';
-  if (value <= 5) return 'uv-moderate';
-  if (value <= 7) return 'uv-high';
-  if (value <= 10) return 'uv-very-high';
-  return 'uv-extreme';
-}
-
-function getUvIndexLevel(value) {
-  if (value === null) return 'N/A';
-  if (value <= 2) return 'Low';
-  if (value <= 5) return 'Moderate';
-  if (value <= 7) return 'High';
-  if (value <= 10) return 'Very High';
-  return 'Extreme';
-}
-
-function getUvIndexRecommendation(value) {
-  if (value === null) return 'UV data unavailable';
-  if (value <= 2) return 'No protection needed';
-  if (value <= 5) return 'Wear sunscreen and seek shade during midday';
-  if (value <= 7) return 'Reduce time in the sun between 10 a.m. and 4 p.m.';
-  if (value <= 10) return 'Minimize sun exposure during midday hours';
-  return 'Avoid sun exposure during midday hours';
-}
-
 </script>
-
-<style>
-.wind-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-}
-
-.wind-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.wind-direction {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 16px;
-  
-  border-radius: 50%;
-  padding: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.wind-icon {
-  font-size: 3.2rem;
-  color: var(--on-surface);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.wind-direction:hover .wind-icon {
-  transform: scale(1.1);
-  color: var(--white);
-}
-
-.wind-info .title-1 {
-  font-size: 2.4rem;
-  font-weight: var(--weight-semiBold);
-  color: var(--on-surface);
-}
-
-.wind-info .label-1 {
-  color: white;
-  font-size: 1.7rem;
-  margin-top: 2px;
-}
-
-.wind-info .label-2 {
-  color: var(--on-surface-variant-2);
-  font-size: 1.4rem;
-  margin-top: 2px;
-}
-
-@media (max-width: 768px) {
-  .wind-wrapper {
-    padding: 8px 0;
-  }
-  
-  .wind-info .title-1 {
-    font-size: 2rem;
-  }
-  
-  .wind-direction {
-    padding: 8px;
-  }
-  
-  .wind-icon {
-    font-size: 2.8rem;
-  }
-}
-
-.uv-index, .precipitation-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.uv-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-pill);
-  overflow: hidden;
-}
-
-.uv-fill {
-  height: 100%;
-  transition: width 0.3s ease, background 0.3s ease;
-}
-
-@media (max-width: 768px) {
-  .highlight-list {
-    grid-template-columns: 1fr;
-  }
-  
-  .uv-bar {
-    height: 6px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .highlight-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  
-  .card-sm {
-    padding: 16px;
-  }
-}
-
-.highlight-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  width: 100%;
-}
-
-.card-sm {
-  padding: 16px;
-  min-height: 120px;
-}
-
-.wrapper {
-  display: flex;
-  align-items: center;
-  column-gap: 8px;
-  padding-top: 6px;
-}
-
-.title-3 {
-  margin-bottom: 4px;
-}
-
-.additional-highlights {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--outline);
-  
-}
-
-.additional-highlights .title-2 {
-  margin-bottom: 16px;
-}
-
-.highlight-grid {
-  display: flex;
-  grid-template-columns: repeat(2, 1fr); /* Change from 1fr to repeat(2, 1fr) */
-  gap: 12px;
-  width: 100%;
-  
-  grid-auto-flow: row; 
-}
-
-.highlight-grid .card-sm {
-  padding: 16px;
-  min-height: 120px;
-}
-
-.highlight-grid .wrapper {
-  padding-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.highlight-grid .uv-index,
-.highlight-grid .precipitation-info {
-  flex: 1;
-}
-
-.highlight-grid > .card {
-  flex: 1 1 0;
-  min-width: 0;  /* prevents overflow */
-}
-.highlight-grid .m-icon {
-  font-size: 3.2rem;
-}
-
-/* Override any conflicting media queries */
-.additional-weather .highlight-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-/* Remove overrides that break grid layout */
-/* .additional-weather .highlight-list > .card { width: 100%; } */
-/* .additional-weather .highlight-list > .card:nth-child(4) { grid-column: span 1; justify-self: start; } */
-
-.additional-weather .highlight-list > .card {
-  grid-column: span 1 !important;
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(40, 40, 40, 0.95);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 1.2rem;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  opacity: 1;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.precip-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 1.2rem;
-  margin-top: 2px;
-  position: relative;
-}
-
-.precip-icon {
-  font-size: 1.3em;
-  color: #2196f3;
-  cursor: pointer;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.precip-value {
-  font-weight: 500;
-  color: #2196f3;
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 140%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(40, 40, 40, 0.95);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  opacity: 1;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.hourly-main-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 4px;
-}
-
-.hourly-temp {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.hourly-precip {
-  font-size: 1.6rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-}
-
-.hourly-precip .precip-icon {
-  font-size: 1.3em;
-  margin-right: 4px;
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 140%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(40, 40, 40, 0.95);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  opacity: 1;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.weather-news-card .news-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.weather-news-card .news-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 10px;
-  padding: 12px 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.weather-news-card .news-item:hover {
-  background: rgba(255,255,255,0.07);
-}
-
-.weather-news-card .news-item.expanded {
-  background: rgba(33,150,243,0.08);
-}
-
-.weather-news-card .m-icon {
-  font-size: 2.4rem;
-  margin-top: 2px;
-}
-
-.weather-news-card .news-content {
-  flex: 1;
-}
-
-.weather-news-card .title-3 {
-  margin: 0 0 2px 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.weather-news-card .label-2 {
-  margin: 0;
-  color: #bdbdbd;
-  font-size: 1.1rem;
-}
-
-.weather-news-card .news-details {
-  margin-top: 8px;
-  background: rgba(0,0,0,0.08);
-  border-radius: 6px;
-  padding: 8px 10px;
-}
-
-.weather-news-card .read-more {
-  display: inline-block;
-  margin-top: 6px;
-  color: #2196f3;
-  font-size: 1.1rem;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-.weather-news-card .read-more:hover {
-  color: #1565c0;
-}
-
-.weather-news-card .expand-icon {
-  font-size: 2rem;
-  margin-left: 8px;
-  align-self: flex-start;
-  color: #bdbdbd;
-}
-
-.weather-news-card .refresh-btn {
-  background: none;
-  border: none;
-  color: #2196f3;
-  font-size: 1.8rem;
-  margin-left: 8px;
-  cursor: pointer;
-  vertical-align: middle;
-  transition: color 0.2s;
-}
-
-.weather-news-card .refresh-btn:disabled {
-  color: #bdbdbd;
-  cursor: not-allowed;
-}
-
-.weather-news-card .fade-enter-active, .weather-news-card .fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.weather-news-card .fade-enter-from, .weather-news-card .fade-leave-to {
-  opacity: 0;
-}
-
-.weather-animated-logo-gradient {
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 0.5em;
-  width: 40px;
-  height: 40px;
-}
-.weather-animated-logo-gradient .sun-group {
-  animation: sun-float 4s ease-in-out infinite;
-}
-@keyframes sun-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-.weather-animated-logo-gradient .gradient-cloud-group {
-  animation: gradient-cloud-slide 3.5s ease-in-out infinite;
-}
-@keyframes gradient-cloud-slide {
-  0%, 100% { transform: translateX(0) translateY(0); }
-  50% { transform: translateX(5px) translateY(-2px); }
-}
-
-.uv-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.uv-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.uv-low {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.uv-moderate {
-  background: rgba(255, 235, 59, 0.2);
-  color: #FFC107;
-}
-
-.uv-high {
-  background: rgba(255, 152, 0, 0.2);
-  color: #FF9800;
-}
-
-.uv-very-high {
-  background: rgba(244, 67, 54, 0.2);
-  color: #F44336;
-}
-
-.uv-extreme {
-  background: rgba(156, 39, 176, 0.2);
-  color: #9C27B0;
-}
-
-.uv-recommendation {
-  font-size: 1.2rem;
-  color: var(--on-surface-variant);
-  margin-top: 8px;
-  line-height: 1.4;
-}
-
-
-
-.feature-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 28px;
-  padding: 36px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  width: 100%;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.feature-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.06) 0%,
-    transparent 50%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.feature-card:hover::before {
-  opacity: 1;
-}
-
-.feature-card:hover::after {
-  opacity: 1;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.feature-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-icon::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.feature-card:hover .feature-icon {
-  transform: scale(1.1) rotate(5deg);
-}
-
-.feature-card:hover .feature-icon::before {
-  opacity: 0.2;
-}
-
-.feature-icon .m-icon {
-  font-size: 28px;
-  color: #fff;
-  position: relative;
-  z-index: 1;
-}
-
-.feature-card h3 {
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0;
-  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.feature-card p {
-  font-size: 1.5rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 32px;
-}
-
-.feature-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 32px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 20px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.stat-item:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.stat-item .m-icon {
-  font-size: 28px;
-  color: #fff;
-  margin-bottom: 12px;
-  transition: transform 0.4s ease;
-}
-
-.stat-item:hover .m-icon {
-  transform: scale(1.1);
-}
-
-.stat-item span:not(.m-icon) {
-  font-size: 1.4rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  
-  
-  .feature-card {
-    padding: 28px;
-    border-radius: 24px;
-  }
-  
-  .feature-card h3 {
-    font-size: 2rem;
-  }
-  
-  .feature-stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  
-  .stat-item {
-    padding: 16px;
-  }
-}
-
-@media (max-width: 600px) {
-  
-  
-  .feature-card {
-    padding: 24px;
-  }
-  
-  .feature-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .stat-item {
-    padding: 20px;
-  }
-  
-  .feature-icon {
-    width: 48px;
-    height: 48px;
-  }
-  
-  .feature-icon .m-icon {
-    font-size: 24px;
-  }
-}
-
-.hero-flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 48px;
-}
-.hero-text {
-  flex: 1;
-  min-width: 250px;
-}
-.hero-lottie {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 300px;
-  min-height: 300px;
-  width: 500px;
-  
-}
-
-.sun-rays {
-  transform-origin: 60px 60px;
-  animation: sun-rays-rotate 4s linear infinite;
-}
-@keyframes sun-rays-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.hero-animated-sun {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 18px;
-}
-.sun-rays {
-  transform-origin: 60px 60px;
-  animation: sun-rays-rotate 4s linear infinite;
-}
-@keyframes sun-rays-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.hero-flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 48px;
-}
-.hero-animated-weather-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 180px;
-  min-height: 180px;
-  width: 180px;
-  height: 180px;
-  margin-left: 32px;
-}
-.weather-sun-rays {
-  transform-origin: 60px 60px;
-  animation: sun-rays-rotate 4s linear infinite;
-}
-@keyframes sun-rays-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.weather-raindrops ellipse {
-  animation: rain-drop 1.2s infinite alternate;
-}
-.weather-raindrops ellipse:nth-child(2) {
-  animation-delay: 0.4s;
-}
-.weather-raindrops ellipse:nth-child(3) {
-  animation-delay: 0.8s;
-}
-@keyframes rain-drop {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0.3; transform: translateY(8px); }
-}
-@media (max-width: 900px) {
-  .hero-flex {
-    flex-direction: column;
-    gap: 24px;
-  }
-  .hero-animated-weather-icon {
-    min-width: 120px;
-    min-height: 120px;
-    width: 120px;
-    height: 120px;
-    margin-left: 0;
-    margin-top: 16px;
-  }
-}
-
-.animated-sun-rays {
-  transform-origin: 90px 100px;
-  animation: sun-rays-spin 6s linear infinite;
-}
-@keyframes sun-rays-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.animated-cloud {
-  animation: cloud-float 3s ease-in-out infinite alternate;
-}
-@keyframes cloud-float {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
-}
-.hero-animated-weather-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 180px;
-  min-height: 180px;
-  width: 180px;
-  height: 180px;
-  margin-left: 32px;
-}
-@media (max-width: 900px) {
-  .hero-animated-weather-icon {
-    min-width: 120px;
-    min-height: 120px;
-    width: 120px;
-    height: 120px;
-    margin-left: 0;
-    margin-top: 16px;
-  }
-}
-</style>
-
-<!-- HERO SECTION START -->
-<section class="main-hero">
-  <div class="hero-flex">
-    <div class="hero-text">
-      <h1 class="main-title">
-        <span class="text-normal">Advanced</span>
-        <span class="text-gradient">Weather</span>
-        <span class="text-normal">Intelligence</span>
-      </h1>
-    </div>
-    <div class="hero-animated-weather-icon">
-      <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Animated Sun Rays -->
-        <g class="animated-sun-rays">
-          <line x1="130" y1="60" x2="150" y2="40" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="90" y1="30" x2="90" y2="10" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="50" y1="60" x2="30" y2="40" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="130" y1="100" x2="150" y2="100" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="50" y1="100" x2="30" y2="100" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="130" y1="140" x2="150" y2="160" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="90" y1="150" x2="90" y2="170" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-          <line x1="50" y1="140" x2="30" y2="160" stroke="#FFC107" stroke-width="5" stroke-linecap="round"/>
-        </g>
-        <!-- Sun -->
-        <circle cx="90" cy="100" r="40" fill="#FFD600" stroke="#FFC107" stroke-width="5"/>
-        <!-- Animated Cloud -->
-        <g class="animated-cloud">
-          <ellipse cx="110" cy="140" rx="38" ry="20" fill="#fff" stroke="#90caf9" stroke-width="4"/>
-          <ellipse cx="70" cy="150" rx="28" ry="14" fill="#E3F2FD" stroke="#90caf9" stroke-width="4"/>
-        </g>
-      </svg>
-    </div>
-  </div>
-  <p class="hero-subtitle" style="text-align:center; margin-top: 24px;">Experience the future of weather forecasting with AI-powered insights</p>
-</section>
-<!-- HERO SECTION END -->
-
-<style>
-.hero-flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 48px;
-}
-.hero-text {
-  flex: 1;
-  min-width: 250px;
-}
-.hero-lottie {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 10px;
-  min-height: 10px;
-  width: 300px;
-  height: 200px;
-}
-@media (max-width: 900px) {
-  .hero-flex {
-    flex-direction: column;
-    gap: 24px;
-  }
-  .hero-lottie {
-    min-width: 200px;
-    min-height: 200px;
-    width: 90vw;
-    height: 50vw;
-    max-width: 95vw;
-    margin-left: 0;
-    margin-top: 16px;
-  }
-}
-@media (max-width: 1024px) {
-  .hero-flex {
-    gap: 32px;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-flex {
-    flex-direction: column;
-    gap: 24px;
-  }
-}
-
-
-
-@media (max-width: 600px) {
-  
-  .search-container {
-    display: none !important;
-  }
-  .search-btn {
-    display: flex !important;
-    min-width: 40px;
-    height: 40px;
-    margin-right: 8px;
-    /* Use only default .btn-primary styles for background, border, border-radius, and padding */
-  }
-  .search-btn .search-icon {
-    font-size: 1.7rem;
-    color: #fff;
-  }
-}
-@media (min-width: 600px) {
-  .search-btn {
-    display: none !important;
-  }
-}
-</style>
-
-<style>
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #0A0A0A; /* Or use your app's gradient if preferred */
-   
-}
-</style>
-
-
-
-

@@ -61,8 +61,14 @@ const AssistantHandler = async (req, res) => {
 
     // Create a Gemini prompt with the weather summary and analytics data
     const geminiPrompt = `
-     You are a helpful weather assistant.
-      Given the following weather data and analytics, answer the user's question accurately.
+     
+    You are a friendly and proactive weather advisor. Your goal is to give a cheerful and easy-to-understand weather update that helps the user plan their day.
+     ### Your Core Rules
+    1.  **Be a Weather Expert:** Your primary function is to answer questions about the weather.
+    2.  **Handle Greetings:** You SHOULD respond to simple greetings like "hi", "hello", or "how are you?". Just be friendly and brief, then offer to help with the weather.
+    3.  **Decline Off-Topic Questions:** If the user asks a question that is NOT about weather and is NOT a simple greeting (e.g., "What is the capital of Egypt?", "Tell me a story"), you MUST politely decline. State that you are a weather assistant and can only help with weather-related questions.
+    ---
+    Given the weather data:
 
       Location: ${currentLocation}
       Coordinates: Latitude ${coordinates.lat}, Longitude ${coordinates.lon}
@@ -83,7 +89,12 @@ const AssistantHandler = async (req, res) => {
 
       User Question: ${userQuestion}
 
-      Your response:
+       Your Response:
+    1.  Start with a fun and energetic greeting.
+    2.  Answer the user's question directly but conversationally.
+    3.  Provide the most important weather details (temp, high/low, and summary).
+    4.  **Crucially, add a "What to Wear" or "Today's Tip" section.** Based on the weather, give a practical suggestion. For example, "It's a hot one, so light clothing is a must!" or "Don't forget your sunglasses today! " dont add it when user ask for predection for the next day"
+    5.  Keep the tone positive and encouraging. Use emojis! ☀️😎
     `;
 
   // Generate a response from Gemini based on the user's question and weather data
@@ -93,6 +104,7 @@ const AssistantHandler = async (req, res) => {
     });
 
     const geminiResponse = response1.text;
+    console.log("Gemini Response:", geminiResponse);
 
     // Send the response back to the client
     return res.status(200).json({
@@ -101,7 +113,7 @@ const AssistantHandler = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error(error);
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while processing your request.',

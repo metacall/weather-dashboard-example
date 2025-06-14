@@ -494,6 +494,7 @@
   overflow-x: hidden;
 }
 .feature-card {
+  
   position: relative;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 28px;
@@ -596,7 +597,7 @@
   color: #fff;
   margin: 0;
   background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -762,6 +763,17 @@
     font-size: 2.5rem;
     letter-spacing: 2.5px;
     margin-right: 0.3rem;
+  }
+  @media (max-width: 900px) {
+   
+    .hero-animated-weather-icon {
+      min-width: 120px;
+      min-height: 120px;
+      width: 120px;
+      height: 120px;
+      margin-left: 0;
+      margin-top: 16px;
+    }
   }
 }
 
@@ -2923,7 +2935,34 @@
     min-height: auto;
   }
 }
+.additional-weather .highlight-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.highlight-grid {
+  display: flex;
+  flex-flow: row wrap;
+  /* Change from 1fr to repeat(2, 1fr) */
+  gap: 12px;
+  width: 100%;
+  
+  
+}
 @media (max-width: 480px) {
+  .highlight-grid {
+    display: flex;
+    flex-direction: column;
+    /* Change from 1fr to repeat(2, 1fr) */
+    gap: 12px;
+    width: fit-content;
+}
+.additional-weather .highlight-list {
+  display: flex
+;
+  flex-flow: column;
+  gap: 12px;
+}
   .landing-content {
     padding: 1.5rem 0.75rem;
     gap: 1.5rem;
@@ -3057,4 +3096,372 @@
 .slider-item::after {
   content: none !important;
   display: none !important;
+}
+
+/*
+weather rain precipitation tooltip
+*/
+
+.tooltip {
+
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 40, 40, 0.95);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+
+.wind-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.wind-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.wind-direction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16px;
+  
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.wind-icon {
+  font-size: 3.2rem;
+  color: var(--on-surface);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.wind-direction:hover .wind-icon {
+  transform: scale(1.1);
+  color: var(--white);
+}
+
+.wind-info .title-1 {
+  font-size: 2.4rem;
+  font-weight: var(--weight-semiBold);
+  color: var(--on-surface);
+}
+
+.wind-info .label-1 {
+  color: white;
+  font-size: 1.7rem;
+  margin-top: 2px;
+}
+
+.wind-info .label-2 {
+  color: var(--on-surface-variant-2);
+  font-size: 1.4rem;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .wind-wrapper {
+    padding: 8px 0;
+  }
+  
+  .wind-info .title-1 {
+    font-size: 2rem;
+  }
+  
+  .wind-direction {
+    padding: 8px;
+  }
+  
+  .wind-icon {
+    font-size: 2.8rem;
+  }
+}
+
+.uv-index, .precipitation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.uv-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.uv-low {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.uv-moderate {
+  background: rgba(255, 235, 59, 0.2);
+  color: #FFC107;
+}
+
+.uv-high {
+  background: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+.uv-very-high {
+  background: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+}
+
+.uv-extreme {
+  background: rgba(156, 39, 176, 0.2);
+  color: #9C27B0;
+}
+.uv-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.uv-fill {
+  height: 100%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .highlight-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .uv-bar {
+    height: 6px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .highlight-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .card-sm {
+    padding: 16px;
+  }
+}
+
+.highlight-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.card-sm {
+  padding: 16px;
+  min-height: 120px;
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+  padding-top: 6px;
+}
+
+.title-3 {
+  margin-bottom: 4px;
+}
+
+.additional-highlights {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--outline);
+  
+}
+
+.additional-highlights .title-2 {
+  margin-bottom: 16px;
+}
+
+
+
+.highlight-grid .card-sm {
+  padding: 16px;
+  min-height: 120px;
+}
+
+.highlight-grid .wrapper {
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.highlight-grid .uv-index,
+.highlight-grid .precipitation-info {
+  flex: 1;
+}
+
+.highlight-grid > .card {
+  flex: 1 1 0;
+  min-width: 0;  /* prevents overflow */
+}
+.highlight-grid .m-icon {
+  font-size: 3.2rem;
+}
+
+/* Override any conflicting media queries */
+
+
+
+.additional-weather .highlight-list > .card {
+  grid-column: span 1 !important;
+}
+
+
+
+.precip-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 1.2rem;
+  margin-top: 2px;
+  position: relative;
+}
+
+.precip-icon {
+  font-size: 1.3em;
+  color: #2196f3;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.precip-value {
+  font-weight: 500;
+  color: #2196f3;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 40, 40, 0.95);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.hourly-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.hourly-temp {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hourly-precip {
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.hourly-precip .precip-icon {
+  font-size: 1.3em;
+  margin-right: 4px;
+}
+
+.weather-animated-logo-gradient {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5em;
+  width: 40px;
+  height: 40px;
+}
+
+
+
+
+
+
+.hero-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+@media (max-width: 600px) {
+  .hero-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+  
+  .search-container {
+    display: none !important;
+  }
+  .search-btn {
+    display: flex !important;
+    min-width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    /* Use only default .btn-primary styles for background, border, border-radius, and padding */
+  }
+  .search-btn .search-icon {
+    font-size: 1.7rem;
+    color: #fff;
+  }
+}
+@media (min-width: 600px) {
+  .search-btn {
+    display: none !important;
+  }
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0A0A0A; /* Or use your app's gradient if preferred */
+   
 }
