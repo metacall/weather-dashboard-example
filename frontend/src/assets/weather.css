@@ -1146,6 +1146,9 @@
 
 /* Enhanced Button Animations */
 .btn-primary {
+
+  height: 48px;
+  line-height: 48px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -1438,6 +1441,7 @@
     0 4px 15px rgba(0, 0, 0, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 18px;
 }
 
 #ai-button::before {
@@ -1490,10 +1494,7 @@
   animation: glow-once 2s ease-out forwards;
 }
 
-#ai-button .m-icon {
-  color: #fff;
-  margin-right: 0.5rem;
-}
+
 
 #ai-button .span {
   position: relative;
@@ -2950,19 +2951,26 @@
   
 }
 @media (max-width: 480px) {
+  
+ 
   .highlight-grid {
     display: flex;
     flex-direction: column;
     /* Change from 1fr to repeat(2, 1fr) */
     gap: 12px;
-    width: fit-content;
-}
-.additional-weather .highlight-list {
-  display: flex
-;
-  flex-flow: column;
-  gap: 12px;
-}
+    width: 100%;
+    height: auto;
+  }
+  #uv-card {
+    height: 150px;
+    min-height: 150px;
+    box-sizing: border-box;
+  }
+  .additional-weather .highlight-list {
+    display: flex;
+    flex-flow: column;
+    gap: 12px;
+  }
   .landing-content {
     padding: 1.5rem 0.75rem;
     gap: 1.5rem;
@@ -3257,22 +3265,14 @@ weather rain precipitation tooltip
 }
 
 @media (min-width: 1200px) {
-  .highlight-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
+ 
   
   .card-sm {
     padding: 16px;
   }
 }
 
-.highlight-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  width: 100%;
-}
+
 
 .card-sm {
   padding: 16px;
@@ -3335,8 +3335,6 @@ weather rain precipitation tooltip
 .additional-weather .highlight-list > .card {
   grid-column: span 1 !important;
 }
-
-
 
 .precip-row {
   display: flex;
@@ -3431,26 +3429,41 @@ weather rain precipitation tooltip
 
 @media (max-width: 600px) {
   .hero-flex {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 48px;
-}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+  }
   
   .search-container {
     display: none !important;
   }
-  .search-btn {
-    display: flex !important;
-    min-width: 40px;
-    height: 40px;
-    margin-right: 8px;
-    /* Use only default .btn-primary styles for background, border, border-radius, and padding */
+  .search-btn,
+  .current-location-btn,
+  #ai-button{
+   
+    font-size: 18px;
+  }
+  
+  #ai-button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
   }
   .search-btn .search-icon {
     font-size: 1.7rem;
     color: #fff;
+  }
+  #ai-button .m-icon {
+    font-size: 17px;
   }
 }
 @media (min-width: 600px) {
@@ -3465,3 +3478,12 @@ html, body {
   background: #0A0A0A; /* Or use your app's gradient if preferred */
    
 }
+
+.uv-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+    

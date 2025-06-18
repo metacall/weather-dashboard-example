@@ -1,10 +1,19 @@
 const { defineConfig } = require('@vue/cli-service')
+
 module.exports = defineConfig({
-  transpileDependencies: true
-})
-module.exports = {
+  transpileDependencies: true,
   configureWebpack: {
-    ignoreWarnings: [/Module not found/]
+    resolve: {
+      alias: {
+        '@': require('path').resolve(__dirname, 'src')
+      }
+    }
+  },
+  chainWebpack: config => {
+    config.plugin('define').tap(args => {
+      args[0].__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = 'false'
+      return args
+    })
   },
   pwa: {
     name: 'Climatic',
@@ -12,5 +21,5 @@ module.exports = {
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
-}
-};
+  }
+});

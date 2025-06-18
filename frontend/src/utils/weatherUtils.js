@@ -106,7 +106,7 @@ export function weatherUtils() {
     return dewPoint;
   }
   const getCityName = async (lat, lon) => {
-    console.log("lat",lat, "lon",lon)
+    
   const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
 
   try {

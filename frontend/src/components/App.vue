@@ -1,6 +1,6 @@
 <template>
   <div class="weather-dashboard">
-    <div class="location-loading " :class="{ 'active': isLocationLoading }">
+    <div class="location-loading" :class="{ 'active': isLocationLoading }">
       <div class="location-content">
         <div class="location-icon">
           <div class="location-pulse"></div>
@@ -24,7 +24,7 @@
     </div>
     
     <WeatherNavbar
-      :is-header-blur="isHeaderBlur"
+      
       :is-not-ready="isnotReady"
       :is-disabled="isdisabled"
       :is-current-location="isCurrentLocation"
@@ -350,7 +350,7 @@
               <div class="additional-highlights">
                 <h2 class="title-2">Weather Details</h2>
                 <div class="highlight-grid">
-                  <div class="card card-sm highlight-card">
+                  <div id="uv-card" class="card card-sm highlight-card">
                     <h3 class="title-3">UV Index</h3>
                     <div class="wrapper">
                       <span class="m-icon">wb_sunny</span>
@@ -369,7 +369,7 @@
                             }"
                           ></div>
                         </div>
-                        <div class="uv-info">
+                        <div class="uv-info uv-info-row">
                           <p class="title-1">{{ uvIndex !== null ? uvIndex.toFixed(1) : 'N/A' }}</p>
                           <span class="uv-badge" :class="getUvIndexClass(uvIndex)">
                             {{ getUvIndexLevel(uvIndex) }}
@@ -519,71 +519,11 @@
       </article>
     </main>
     
-    <div class="search-overlay" :class="{ 'active': isSearchActive }">
-      <div class="search-popup">
-        <div class="search-header">
-          <h2 class="search-title">Search Location</h2>
-          <button 
-            class="icon-btn close-btn" 
-            aria-label="close search"
-            @click="isSearchActive = false"
-          >
-            <span class="m-icon">close</span>
-          </button>
-        </div>
-        <div class="search-content">
-          <div class="search-input-wrapper">
-            <input 
-              type="search" 
-              name="search" 
-              placeholder="Enter city name..."  
-              @input="SearchInput"
-              class="search-field" 
-              :class="{ 'searching': isSearching }"  
-              autocomplete="off" 
-              data-search-field 
-              v-model="city" 
-              @keyup.enter="fetchWeather"
-              ref="searchInput"
-            >
-            <span class="m-icon search-icon">search</span>
-          </div>
-          <div 
-            class="search-results" 
-            v-if="cities.length > 0 || isSearching || !city || (city && !isSearching && cities.length === 0)"
-          >   
-            <div v-if="isSearching" class="loading-state">
-              <div class="loading-circle"></div>
-              <p>Searching...</p>
-            </div>
-            <div v-else-if="!city" class="no-results">
-              <span class="m-icon no-results-icon">search</span>
-              <h3 class="no-results-title">Start Searching</h3>
-              <p class="no-results-message">Enter a city name to find weather information</p>
-            </div>
-            <div v-else-if="city && !isSearching && cities.length === 0" class="no-results">
-              <span class="m-icon no-results-icon">search_off</span>
-              <h3 class="no-results-title">No Results Found</h3>
-              <p class="no-results-message">No cities found matching your search</p>
-            </div>
-            <ul v-else class="results-list">
-              <li
-                v-for="city in cities"
-                :key="`${city.lat}-${city.lon}`"
-                class="result-item"
-                @click="selectCity(city)"
-              >
-                <span class="m-icon">location_on</span>
-                <div class="result-content">
-                  <p class="city-name">{{ city.name }}</p>
-                  <p class="city-details">{{ city.state ? `${city.state}, ` : '' }}{{ city.country }}</p>
-                </div>
-              </li>                              
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SearchPage 
+      :is-search-active="isSearchActive"
+      @close="isSearchActive = false"
+      @city-selected="fetchWeather"
+    />
 
     <div class="error-popup" :class="{ 'active': showError }">
       <div class="error-content">
@@ -608,7 +548,30 @@
 </template>
 
 <script setup>
-import { weatherUtils } from '@/weather-utils.js';
+import { ref,  watch, nextTick, computed, reactive } from "vue";
+import SearchPage from './SearchPage.vue';
+import AssistantOverlay from './AssistantOverlay.vue';
+import { weatherUtils } from '@/utils/weatherUtils.js';
+import WeatherNavbar from './Navbar.vue';
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue';
+const isnotReady = ref(true);
+const weather = ref(null);
+const forecast = ref("");
+const hourly = ref("");
+const air_quality = ref("");
+const isSearchActive = ref(false);
+const isdisabled = ref(false);
+const skeleton = ref(true);
+const isCurrentLocation = ref(false);
+const weatherSummary = ref(null);
+const loading = ref(false);
+const errorMessage = ref('');
+const showError = ref(false);
+const chartCanvas = ref(null);
+const forecastData = ref([]);
+const city = ref("");
+let weatherChart = null;
+
 const {
     getAqiMessage,
     getWeatherIcon,
@@ -622,45 +585,7 @@ const {
     calculateDewPoint,
     getCityName
 } = weatherUtils();
-import WeatherNavbar from './Navbar.vue';
-import { ref, onMounted, defineEmits, onUnmounted, watch, nextTick, computed, reactive } from "vue";
-import _debounce from 'lodash.debounce';
-import axios from 'axios';
-import { Chart, registerables } from 'chart.js';
-import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
-import AssistantOverlay from './AssistantOverlay.vue';
-
-
-const emit = defineEmits(['city-selected']);
-
-Chart.register(...registerables);
-
-const SearchInput = _debounce(() => {
-  searchCities();
-}, 300);
-
-const isnotReady = ref(true);
-const city = ref("");
-const weather = ref(null);
-const forecast = ref("");
-const hourly = ref("");
-const air_quality = ref("");
-const isSearchActive = ref(false);
-const isdisabled = ref(false);
-const isSearching = ref(false);
-const skeleton = ref(true);
-const query = ref('');
-const cities = ref([]);
-const isCurrentLocation = ref(false);
-
-const weatherSummary = ref(null);
-const loading = ref(false);
-const loadingTimeout = ref(null);
-const errorMessage = ref('');
-const showError = ref(false);
-
-const chartCanvas = ref(null);
-const forecastData = ref([]);
+import { WeatherChart } from '@/utils/chartUtils';
 
 const isLocationLoading = ref(false);
 const locationTimeout = ref(null);
@@ -670,17 +595,6 @@ const assistant = reactive({
   response: null,
   userMessage: '',
   chatMessages: []
-});
-
-const isHeaderBlur = ref(false);
-function handleHeaderScroll() {
-  isHeaderBlur.value = window.scrollY > 10;
-}
-onMounted(() => {
-  window.addEventListener('scroll', handleHeaderScroll);
-});
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleHeaderScroll);
 });
 
 const uvIndex = ref(null);
@@ -697,8 +611,6 @@ async function fetchUvIndex(lat, lon) {
     }
     
     const data = await response.json();
-    console.log('UV Index API Response:', data);
-    
     if (data.hourly && data.hourly.uv_index && data.hourly.time) {
       // Get current time
       const now = new Date();
@@ -714,12 +626,7 @@ async function fetchUvIndex(lat, lon) {
           closestIndex = index;
         }
       });
-      
-      // Get the UV index for the closest time slot
       const uvValue = data.hourly.uv_index[closestIndex];
-      console.log('Closest time slot:', data.hourly.time[closestIndex]);
-      console.log('UV Index value:', uvValue);
-      
       // Only set UV index if it's greater than 0
       if (uvValue > 0) {
         uvIndex.value = parseFloat(uvValue.toFixed(1));
@@ -728,9 +635,7 @@ async function fetchUvIndex(lat, lon) {
         const nextIndex = data.hourly.uv_index.findIndex((value, index) => value > 0 && index > closestIndex);
         if (nextIndex !== -1) {
           uvIndex.value = parseFloat(data.hourly.uv_index[nextIndex].toFixed(1));
-          console.log('Next available UV Index:', uvIndex.value);
         } else {
-          console.log('No UV index data available');
           uvIndex.value = 0;
         }
       }
@@ -747,7 +652,6 @@ async function fetchUvIndex(lat, lon) {
 // Update the watch to ensure UV index is fetched when weather data changes
 watch(weather, (val) => {
   if (val && val.coord && val.coord.lat && val.coord.lon) {
-    console.log('Fetching UV index for coordinates:', val.coord.lat, val.coord.lon);
     fetchUvIndex(val.coord.lat, val.coord.lon);
   }
 }, { immediate: true });
@@ -773,117 +677,42 @@ async function fetchForecastData() {
     console.error("Error fetching forecast data:", error);
   }
 }
-let myChart = null;
+
 function createChart() {
-  if (!chartCanvas.value || !forecastData.value.length) return;
-
+  if (!chartCanvas.value || !forecastData.value.length) return
   
-  if (myChart) {
-    myChart.destroy();
+  if (!weatherChart) {
+    weatherChart = new WeatherChart(chartCanvas.value)
   }
-  // Extract data from forecastData
-  const dates = forecastData.value.map(item => item.date);
-  const dayTemperatures = forecastData.value.map(item => Number(item.max_temp));
   
-
-  // Get 2D context from the canvas
-  const ctx = chartCanvas.value.getContext('2d');
-
-  myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      // We'll store the raw date strings in labels,
-      // but override them in the x-axis ticks callback
-      labels: dates,
-      datasets: [
-        {
-          label: 'Day Temperature (°C)',
-          data: dayTemperatures,
-          borderColor: '#B9B6BF',    // Orange line color
-          backgroundColor: 'transparent',
-          tension: 0.4,             // Smoother curve
-          fill: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, 
-      scales: {
-        x: {
-          grid: { display: false },
-          
-          ticks: {
-            color: '#B9B6BF',
-            callback: function (value) {
-              const dateStr = this.getLabelForValue(value); // e.g. "2025-02-13"
-              const dateObj = new Date(dateStr);
-              const day = dateObj.getDate(); // 13
-              const month = dateObj.toLocaleString('en-US', { month: 'short' }); // "Feb"
-              return `${day} ${month}`; // "13 Feb"
-            }
-          }
-        },
-        y: {
-          beginAtZero: false,
-          // Append "°" to each y-axis tick
-          ticks: {
-            color: '#B9B6BF',
-            callback: function (value) {
-              return value + '°';
-            }
-          },
-          title: {
-            display: true,
-            text: 'Temperature (°C)'
-          }
-        }
-      },
-      elements: {
-        point: {
-          radius: 4,
-          backgroundColor: '#F18B60'
-        }
-      }
-    }
-  });
+  weatherChart.createChart(forecastData.value)
 }
 
 async function fetchForCurrentLocation() {
-  console.log('Starting fetchForCurrentLocation');
   if (!navigator.geolocation) {
     console.error('Geolocation is not supported by this browser');
     return;
   }
-
-  console.log('Setting initial states...');
   
-  isLocationLoading.value = false;
-  isCurrentLocation.value = true;
-  loading.value = true;
+  isLocationLoading.value = true; // Set to true to show the loacation loading state
+  loading.value = false; // Set to false to hide the loading state
+  isCurrentLocation.value = true; 
+  
   skeleton.value = true;
   
-  // Set a timeout for location detection
- // 10 seconds timeout
-
   navigator.geolocation.getCurrentPosition(
     async (position) => {
-      console.log('Got position:', position.coords);
       clearTimeout(locationTimeout.value);
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
 
       try {
-        console.log('Fetching weather data for location:', { lat, lon });
         const response = await fetch("http://localhost:5000/weather/current/location", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lat, lon }),
         });
-
-        console.log('Weather API response status:', response.status);
         const data = await response.json();
-        console.log('Weather API response data:', data);
 
         if (!response.ok) {
           throw new Error(data.message || "Failed to fetch weather data");
@@ -892,12 +721,8 @@ async function fetchForCurrentLocation() {
         if (!data || typeof data !== 'object') {
           throw new Error("Invalid response format");
         }
-
         weather.value = data;
-        
-        console.log('Getting city name for coordinates...');
         const current_city = await getCityName(lat, lon);
-        console.log('Got city name:', current_city);
         const cleanedCity = current_city.replace(/\s+City$/, "").trim();
         if (!cleanedCity) throw new Error("Failed to determine city name");
         
@@ -907,7 +732,6 @@ async function fetchForCurrentLocation() {
         // Fetch weather analysis for current location
         await fetchWeatherAnalysis();
         
-        console.log('Fetching additional data...');
         await Promise.all([
           fetchForecast(cleanedCity),
           fetchAirQuality(cleanedCity),
@@ -916,7 +740,7 @@ async function fetchForCurrentLocation() {
         
         isnotReady.value = false;
         city.value = null;
-        
+        isLocationLoading.value = false;
         isCurrentLocation.value = true; // Keep active state
         loading.value = false;
         skeleton.value = false;
@@ -987,76 +811,6 @@ async function fetchForecast(city) {
      // Handle forecast data in UI
 }
 
-async function searchCities() {
-  // Clear previous results
-  cities.value = [];
-
-  // Validate input
-  if (!city.value) return;
-
-  isSearching.value = true;
-
-  try {
-    const response = await axios.post('http://localhost:5000/search/city', {
-      city: city.value
-    });
-
-    if (response.data.length === 0) {
-      return;
-    }
-
-    cities.value = response.data;
-    
-  } catch (error) {
-    console.error('Search error:', error);
-  } finally {
-    
-    isSearching.value = false;
-  }
-}
-
-const fetchWeather = async (selectedCity) => {
-  const city_name = selectedCity
-    ? selectedCity.name
-    : city.value.trim();
-
-  // start loading
-  loading.value     = true;
-  skeleton.value    = true;
-  showError.value   = false;
-    isSearchActive.value = false;
-    
-  // fetch the data
-    const response = await fetch("http://localhost:5000/weather", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ city: city_name }),
-    });
-    const data = await response.json();
-
-  // handle non-200
-    if (!response.ok) {
-    errorMessage.value = data.message || "Failed to fetch weather data";
-    showError.value    = true;
-    // fall through to reset UI...
-  } else {
-    weather.value = data;
-    await fetchWeatherAnalysis();
-    await fetchForecast(city_name);
-    await fetchAirQuality(city_name);
-    fetchForecastData(city_name);
-  }
-
-  // end loading
-  loading.value  = false;
-    skeleton.value = false;
-    
-  // ◀️ **Here's your re‑enable logic**:
-  isdisabled.value       = false;
-  isCurrentLocation.value = false;
-};
-
-
 async function fetchAirQuality(city) {
   try {
     const response = await fetch("http://localhost:5000/air/quality", {
@@ -1095,7 +849,6 @@ const fetchWeatherAnalysis = async () => {
       throw new Error("No weather data available");
     }
 
-    console.log("Fetching analysis for city:", weather.value.name);
     skeleton.value = true;
 
     const response = await fetch("http://localhost:5000/weather/analyze", {
@@ -1107,14 +860,10 @@ const fetchWeatherAnalysis = async () => {
     if (!response.ok) throw new Error("Failed to fetch data");
 
     const data = await response.json();
-    console.log("Weather analysis data:", data);
     
     if (data && data.analytics && data.analytics.summary) {
       weatherSummary.value = data;
       assistant.response = data;
-      // Send initial weather message
-      await sendInitialWeatherMessage();
-      console.log("Updated weather summary:", weatherSummary.value);
     } else {
       throw new Error("Invalid analysis data format");
     }
@@ -1123,60 +872,11 @@ const fetchWeatherAnalysis = async () => {
     console.error("Error fetching weather analysis:", error);
     errorMessage.value = "Failed to get weather analysis. Please try again.";
     showError.value = true;
+    throw error; // Re-throw to be caught by Promise.allSettled
   } finally {
     skeleton.value = false;
   }
 };
-
-async function sendInitialWeatherMessage() {
-  if (!weather.value || !weather.value.weather || !weather.value.weather[0] || !weather.value.main) {
-    console.warn('Weather data not available for initial message');
-    return;
-  }
-  
-  const message = `Current weather in ${weather.value.name}: ${Math.floor(weather.value.main.temp)}°C, ${weather.value.weather[0].description}.`;
-  
-  // Ensure chatMessages is an array and add the message
-  assistant.chatMessages = Array.isArray(assistant.chatMessages) ? [...assistant.chatMessages, {
-    type: 'assistant',
-    text: message
-  }] : [{
-    type: 'assistant',
-    text: message
-  }];
-}
-
-function selectCity(city) {
-
-emit('city-selected', {
-  name: city.name,
-  lat: city.lat,
-  lon: city.lon
-});
-fetchWeather(city)
-// Clear search results
-cities.value = [];
-query.value = '';
-
-}
-onMounted(() => {
-  const cards = document.querySelectorAll('.feature-card');
-  
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      // Calculate angle for gradient
-      const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
-      card.style.setProperty('--gradient-angle', `${angle}deg`);
-    });
-  });
-});
 
 const resetToLanding = async () => {
   weather.value = null
@@ -1185,17 +885,13 @@ const resetToLanding = async () => {
   isdisabled.value = false
   isCurrentLocation.value = false
 }
-// Add cleanup for loading timeout
-onUnmounted(() => {
-  if (loadingTimeout.value) {
-    clearTimeout(loadingTimeout.value);
-  }
-});
+// Add cleanup for message channel
+
 
 const moonPhase = computed(() => getMoonPhase());
 const moonPhaseName = computed(() => {
   const phase = moonPhase.value;
-  console.log("phase",phase)
+  
   if (phase < 0.03 || phase > 0.97) return 'New Moon';
   if (phase < 0.22) return 'Waxing Crescent';
   if (phase < 0.28) return 'First Quarter';
@@ -1205,4 +901,60 @@ const moonPhaseName = computed(() => {
   if (phase < 0.78) return 'Last Quarter';
   return 'Waning Crescent';
 });
+
+const fetchWeather = async (selectedCity) => {
+  try {
+    const city_name = selectedCity
+      ? selectedCity.name
+      : selectedCity.trim();
+
+    loading.value = true;
+    skeleton.value = true;
+    showError.value = false;
+    isSearchActive.value = false;
+    
+    const response = await fetch("http://localhost:5000/weather", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ city: city_name }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      errorMessage.value = data.message || "Failed to fetch weather data";
+      showError.value = true;
+      return;
+    }
+
+    weather.value = data;
+    
+    const results = await Promise.allSettled([
+      fetchWeatherAnalysis(),
+      fetchForecast(city_name),
+      fetchAirQuality(city_name),
+      fetchForecastData(city_name)
+    ]);
+
+    const failures = results.filter(result => result.status === 'rejected');
+    if (failures.length > 0) {
+      console.error('Some requests failed:', failures);
+      errorMessage.value = "Some weather data could not be loaded. Please try again.";
+      showError.value = true;
+    }
+
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      errorMessage.value = "Request timed out. Please try again.";
+    } else {
+      errorMessage.value = error.message || "Failed to fetch weather data";
+    }
+    showError.value = true;
+  } finally {
+    loading.value = false;
+    skeleton.value = false;
+    isdisabled.value = false;
+    isCurrentLocation.value = false;
+  }
+}
 </script>

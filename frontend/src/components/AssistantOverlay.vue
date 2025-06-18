@@ -61,6 +61,11 @@
                 Hello! I'm your weather assistant. How can I help you today?
               </div>
             </div>
+            <div v-if="weather && weather.weather && weather.weather[0]" class="message-bubble assistant">
+              <div class="message-content">
+                Current weather in {{ weather.name }}: {{ Math.floor(weather.main.temp) }}°C, {{ weather.weather[0].description }}.
+              </div>
+            </div>
             <div v-for="(msg, idx) in chatMessages" :key="idx" :class="['message-bubble', msg.type]">
               <div class="message-content" v-if="msg.type === 'assistant'" v-html="renderMarkdown(msg.text)"></div>
               <div class="message-content" v-else>{{ msg.text }}</div>
