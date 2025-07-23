@@ -6,7 +6,7 @@
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.x-brightgreen)
 ![MetaCall](https://img.shields.io/badge/Powered%20by-MetaCall-orange)
 
-**Climatic** is a weather application built with `Vue.js`, Node.js, and Python using MetaCall Loader and Express. It provides a robust weather API with multiple endpoints, including current conditions, forecasts, analytical data processing, and predictions powered by machine learning models.
+**Climatic** is a weather application built with `Vue.js`, Node.js, and Python using MetaCall and Express. It provides a robust weather API with multiple endpoints, including current conditions, forecasts, analytical data processing, and predictions powered by machine learning models.
 
 ## Features
 
@@ -42,7 +42,7 @@ Make sure the following dependencies are installed:
    Open your terminal and run:
    ```bash
    git clone https://github.com/metacall/weather-dashboard-example.git
-   cd backend
+   cd weather-dashboard-example
    ```
 
 2. **Install the requirements**
