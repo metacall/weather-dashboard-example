@@ -48,8 +48,8 @@ Make sure the following dependencies are installed:
 2. **Install the requirements**
    ```bash
    cd backend
-   pip install -r requirements.txt
-   npm install
+   metacall pip install -r requirements.txt
+   metacall npm install
    ```
    This installs all necessary backend dependencies.
 
