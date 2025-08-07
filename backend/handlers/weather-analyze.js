@@ -26,9 +26,6 @@ const weatherAnalyzeHandler = async (req, res) => {
             icon: `https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`
         }));
 
-
-        
-
         res.json({
             forecast: forecast,
             city: city,

@@ -1,3 +1,6 @@
+# docker build -t metacall/weather-dashboard-example .
+# docker run --rm -it metacall/weather-dashboard-example
+
 FROM ubuntu:plucky
 
 RUN apt-get update \
@@ -6,11 +9,13 @@ RUN apt-get update \
 
 WORKDIR /weather-dashboard-example
 
-COPY package.json requirements.txt .
+COPY package.json requirements.txt ./
 
-RUN metacall pip install -r requirements.txt \
+RUN metacall pip3 install -r requirements.txt \
     && metacall npm install
 
 COPY . .
+
+EXPOSE 5000
 
 CMD ["metacall", "main.js"]
